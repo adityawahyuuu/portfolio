@@ -7,7 +7,7 @@ import { Github, Linkedin, Twitter, Mail, Phone, Loader2, CheckCircle, Paperclip
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -49,7 +49,6 @@ export default function Contact({ data }: { data?: ContactData }) {
       const newFiles = Array.from(e.target.files);
       const currentFiles = formData.attachments || [];
       
-      // Check file size (max 5MB per file)
       const oversizedFiles = newFiles.filter(file => file.size > 5 * 1024 * 1024);
       if (oversizedFiles.length > 0) {
         toast({
@@ -60,7 +59,6 @@ export default function Contact({ data }: { data?: ContactData }) {
         return;
       }
       
-      // Check total files (max 3 files)
       if (currentFiles.length + newFiles.length > 3) {
         toast({
           title: "Too Many Files",
@@ -92,7 +90,6 @@ export default function Contact({ data }: { data?: ContactData }) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Convert files to base64 for email attachment
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -102,18 +99,16 @@ export default function Contact({ data }: { data?: ContactData }) {
     });
   };
 
-  // Using API Route with actual file attachments
   const sendEmailWithAPI = async (formData: ExtendedFormData) => {
     try {
       const attachments = [];
       
-      // Convert files to base64 for sending
       if (formData.attachments && formData.attachments.length > 0) {
         for (const file of formData.attachments) {
           const base64Content = await fileToBase64(file);
           attachments.push({
             filename: file.name,
-            content: base64Content.split(',')[1], // Remove data:type;base64, prefix
+            content: base64Content.split(',')[1],
             contentType: file.type,
             size: file.size
           });
@@ -129,7 +124,7 @@ export default function Contact({ data }: { data?: ContactData }) {
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          attachments: attachments, // Now sending actual file data
+          attachments: attachments,
         }),
       });
 
@@ -199,215 +194,197 @@ export default function Contact({ data }: { data?: ContactData }) {
 
   return (
     <>
-      <section id="contact" className="relative py-20 overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-black">
-        <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 backdrop-blur-sm"></div>
-        
-        <div className="container relative z-10 mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Get in Touch
-            </h2>
-            <p className="text-indigo-200 text-xl max-w-2xl mx-auto">
-              Let`s connect and bring your ideas to life!
-            </p>
-          </motion.div>
+      <section id="contact" className="p-6">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold text-white flex items-center">
+            <div className="p-2 rounded-lg mr-3 bg-pink-500">
+              <Mail className="w-5 h-5" />
+            </div>
+            Get in Touch
+          </CardTitle>
+        </CardHeader>
 
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-white/10 backdrop-blur-md border-0 overflow-hidden shadow-xl shadow-purple-500/20">
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.1 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                  >
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-indigo-200 mb-2">
-                        Name *
-                      </label>
-                      <Input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        className="w-full border-indigo-300 bg-white/5 text-white placeholder-indigo-300 focus:border-pink-500 focus:ring-pink-500 transition-all duration-300"
-                        placeholder="Your Name"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-indigo-200 mb-2">
-                        Email *
-                      </label>
-                      <Input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full border-indigo-300 bg-white/5 text-white placeholder-indigo-300 focus:border-pink-500 focus:ring-pink-500 transition-all duration-300"
-                        placeholder="your.email@example.com"
-                      />
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                  >
-                    <label htmlFor="message" className="block text-sm font-medium text-indigo-200 mb-2">
-                      Message *
+        <CardContent className="space-y-6">
+          <p className="text-gray-300 text-center mb-8">
+            Let's connect and bring your ideas to life!
+          </p>
+
+          <Card className="bg-gray-700/50 border-gray-600">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-2">
+                      Name *
                     </label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
+                    <Input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
                       required
-                      rows={4}
-                      className="w-full border-indigo-300 bg-white/5 text-white placeholder-indigo-300 focus:border-pink-500 focus:ring-pink-500 transition-all duration-300"
-                      placeholder="Your message here..."
+                      className="bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
+                      placeholder="Your Name"
                     />
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.25 }}
-                  >
-                    <label htmlFor="attachments" className="block text-sm font-medium text-indigo-200 mb-2">
-                      Attachments (optional)
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
+                      Email *
                     </label>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-center w-full">
-                        <label 
-                          htmlFor="attachments" 
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-indigo-300 border-dashed rounded-lg cursor-pointer bg-white/5 hover:bg-white/10 transition-all duration-300"
-                        >
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Paperclip className="w-8 h-8 mb-2 text-indigo-300" />
-                            <p className="mb-2 text-sm text-indigo-200">
-                              <span className="font-semibold">Click to upload</span> or drag and drop
-                            </p>
-                            <p className="text-xs text-indigo-300">
-                              Max 3 files, 5MB each (PDF, DOC, IMG files)
-                            </p>
-                          </div>
-                          <Input
-                            id="attachments"
-                            type="file"
-                            multiple
-                            onChange={handleFileChange}
-                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif"
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
+                    <Input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-200 mb-2">
+                    Message *
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    rows={4}
+                    className="bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
+                    placeholder="Your message here..."
+                  />
+                </div>
 
-                      {/* Display selected files */}
-                      {formData.attachments && formData.attachments.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-sm text-indigo-200 font-medium">Selected files:</p>
-                          {formData.attachments.map((file, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 20 }}
-                              className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-indigo-300/30"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <Paperclip className="w-4 h-4 text-indigo-300" />
-                                <div>
-                                  <p className="text-sm text-white font-medium">{file.name}</p>
-                                  <p className="text-xs text-indigo-300">{formatFileSize(file.size)}</p>
-                                </div>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeFile(index)}
-                                className="text-indigo-300 hover:text-red-300 hover:bg-red-500/10"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </motion.div>
-                          ))}
+                <div>
+                  <label htmlFor="attachments" className="block text-sm font-medium text-gray-200 mb-2">
+                    Attachments (optional)
+                  </label>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center w-full">
+                      <label 
+                        htmlFor="attachments" 
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-500 border-dashed rounded-lg cursor-pointer bg-gray-600/50 hover:bg-gray-600/70 transition-all duration-300"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Paperclip className="w-8 h-8 mb-2 text-gray-400" />
+                          <p className="mb-2 text-sm text-gray-300">
+                            <span className="font-semibold">Click to upload</span> or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            Max 3 files, 5MB each (PDF, DOC, IMG files)
+                          </p>
                         </div>
-                      )}
+                        <Input
+                          id="attachments"
+                          type="file"
+                          multiple
+                          onChange={handleFileChange}
+                          accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif"
+                          className="hidden"
+                        />
+                      </label>
                     </div>
-                  </motion.div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                  >
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full group relative overflow-hidden bg-gradient-to-r from-pink-500 to-indigo-500 text-white transition-all duration-300 ease-out hover:shadow-lg hover:shadow-pink-500/50"
-                    >
-                      <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></span>
-                      <span className="relative flex items-center justify-center text-lg font-semibold py-3">
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="animate-spin mr-2" />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <Mail className="mr-2" />
-                            Send Message
-                            {formData.attachments && formData.attachments.length > 0 && (
-                              <span className="ml-2 text-xs bg-white/20 px-2 py-1 rounded-full">
-                                +{formData.attachments.length} files
-                              </span>
-                            )}
-                          </>
+                    {formData.attachments && formData.attachments.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-300 font-medium">Selected files:</p>
+                        {formData.attachments.map((file, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="flex items-center justify-between p-3 bg-gray-600/50 rounded-lg border border-gray-500/30"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Paperclip className="w-4 h-4 text-gray-400" />
+                              <div>
+                                <p className="text-sm text-white font-medium">{file.name}</p>
+                                <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFile(index)}
+                              className="text-gray-400 hover:text-red-300 hover:bg-red-500/10"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-all duration-300"
+                >
+                  <span className="flex items-center justify-center">
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2 w-4 h-4" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 w-4 h-4" />
+                        Send Message
+                        {formData.attachments && formData.attachments.length > 0 && (
+                          <span className="ml-2 text-xs bg-white/20 px-2 py-1 rounded-full">
+                            +{formData.attachments.length}
+                          </span>
                         )}
-                      </span>
-                    </Button>
-                  </motion.div>
-                </form>
+                      </>
+                    )}
+                  </span>
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Contact Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+            <Card className="bg-gray-700/50 border-gray-600 hover:border-pink-500/50 transition-colors">
+              <CardContent className="p-4 text-center">
+                <Mail className="w-8 h-8 text-pink-400 mx-auto mb-2" />
+                <p className="text-gray-300 text-sm">Email</p>
+                <a 
+                  href="mailto:pradhanaaditya30@gmail.com" 
+                  className="text-white hover:text-pink-300 transition-colors text-sm"
+                >
+                  pradhanaaditya30@gmail.com
+                </a>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-700/50 border-gray-600 hover:border-pink-500/50 transition-colors">
+              <CardContent className="p-4 text-center">
+                <Phone className="w-8 h-8 text-pink-400 mx-auto mb-2" />
+                <p className="text-gray-300 text-sm">Phone</p>
+                <a 
+                  href="tel:+6281315227951" 
+                  className="text-white hover:text-pink-300 transition-colors text-sm"
+                >
+                  +62 81315227951
+                </a>
               </CardContent>
             </Card>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8"
-          >
-            <a href="mailto:pradhanaaditya30@gmail.com" className="flex items-center text-indigo-200 hover:text-pink-300 transition-colors">
-              <Mail className="w-6 h-6 mr-2" />
-              pradhanaaditya30@gmail.com
-            </a>
-            <a href="tel:+6281315227951" className="flex items-center text-indigo-200 hover:text-pink-300 transition-colors">
-              <Phone className="w-6 h-6 mr-2" />
-              +62 81315227951
-            </a>
-          </motion.div>
-
+          {/* Social Links */}
           {data?.socialLinks && data.socialLinks.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-8 flex justify-center space-x-6"
-            >
+            <div className="flex justify-center space-x-4 mt-6">
               {data.socialLinks.map((link, index) => {
                 const Icon = socialIcons[link.icon] || (() => null);
                 return (
@@ -416,22 +393,22 @@ export default function Contact({ data }: { data?: ContactData }) {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-indigo-200 hover:text-pink-300 transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
+                    className="p-3 bg-gray-700/50 border border-gray-600 hover:border-pink-500/50 rounded-full text-gray-400 hover:text-pink-300 transition-all duration-300"
                   >
-                    <Icon className="w-8 h-8" />
+                    <Icon className="w-6 h-6" />
                     <span className="sr-only">{link.name}</span>
                   </motion.a>
                 );
               })}
-            </motion.div>
+            </div>
           )}
-        </div>
+        </CardContent>
       </section>
 
       <Dialog open={showThankYou} onOpenChange={setShowThankYou}>
-        <DialogContent className="bg-gradient-to-br from-indigo-900/95 via-purple-900/95 to-pink-900/95 border-indigo-500/20 backdrop-blur-xl">
+        <DialogContent className="bg-gray-800 border-gray-600">
           <DialogHeader>
             <motion.div
               initial={{ scale: 0 }}
@@ -444,14 +421,14 @@ export default function Contact({ data }: { data?: ContactData }) {
             <DialogTitle className="text-2xl text-center text-white mb-2">
               Thank You for Reaching Out!
             </DialogTitle>
-            <DialogDescription className="text-center text-indigo-200">
-              I have received your message{formData.attachments?.length ? ' with attachment info' : ''} and will get back to you as soon as possible. Have a great day!
+            <DialogDescription className="text-center text-gray-300">
+              I have received your message{formData.attachments?.length ? ' with attachments' : ''} and will get back to you as soon as possible. Have a great day!
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-center mt-4">
             <Button
               onClick={() => setShowThankYou(false)}
-              className="bg-gradient-to-r from-pink-500 to-indigo-500 text-white hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300"
+              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600"
             >
               Close
             </Button>

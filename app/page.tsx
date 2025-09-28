@@ -30,17 +30,45 @@ export default function Page() {
   }, []);
 
   if (loading) {
-    return <Loading />
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
+        <Loading />
+      </div>
+    );
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      {/* Header with consistent AdminPanel styling */}
       <Header />
-      <Home data={data ? data.home : data} />
-      <Projects data={data ? data.project : data} />
-      <Experience data={data ? data.experience : data} />
-      <Contact data={data ? data.contact : data} />
-      <Footer />
+      
+      {/* Main content with AdminPanel-style layout */}
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Home Section - AdminPanel Card Style */}
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
+          <Home data={data ? data.home : data} />
+        </div>
+        
+        {/* Projects Section - AdminPanel Card Style */}
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
+          <Projects data={data ? data.project : data} />
+        </div>
+        
+        {/* Experience Section - AdminPanel Card Style */}
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
+          <Experience data={data ? data.experience : data} />
+        </div>
+        
+        {/* Contact Section - AdminPanel Card Style */}
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
+          <Contact data={data ? data.contact : data} />
+        </div>
+      </div>
+      
+      {/* Footer with AdminPanel styling */}
+      <div className="bg-gray-800/50 backdrop-blur-xl border-t border-gray-700">
+        <Footer />
+      </div>
     </div>
   )
 }

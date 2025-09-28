@@ -3,13 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Menu, X, User, Home, Code, Briefcase, BookOpen, Mail } from 'lucide-react'
+import { Menu, X, User, Home, Briefcase, BookOpen, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('')
   const router = useRouter()
 
@@ -17,11 +16,8 @@ export default function Header() {
     const sections = ['home', 'projects', 'experience', 'contact']
     
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-
-      // pakai tinggi header sebagai ambang
       const headerH = document.querySelector('header')?.clientHeight ?? 0;
-      const y = headerH + 1; // garis cek sedikit di bawah header
+      const y = headerH + 1;
 
       const currentSection = sections.find(section => {
         const element = document.getElementById(section)
@@ -46,7 +42,7 @@ export default function Header() {
     const el = document.getElementById(id);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setActiveSection(id); // update segera, kalau scroll minim tidak terdeteksi
+    setActiveSection(id);
   };
 
   const handleAdminClick = () => {
@@ -61,23 +57,21 @@ export default function Header() {
   ]
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-500 ${
-      scrolled ? 'bg-background/70 backdrop-blur-xl shadow-lg' : 'bg-transparent'
-    }`}>
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold transition-colors duration-300 hover:text-primary/80">
+    <header className="sticky top-0 z-50 bg-gray-800/50 backdrop-blur-xl border-b border-gray-700">
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="text-2xl font-bold">
             <motion.span
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500"
+              className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500"
             >
               Portfolio
             </motion.span>
           </Link>
           
-          <nav className="hidden md:flex space-x-1">
+          <nav className="hidden md:flex space-x-2">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.href}
@@ -85,17 +79,17 @@ export default function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link 
-                  href={item.href}
+                <Button
+                  variant={activeSection === item.href.slice(1) ? "secondary" : "ghost"}
                   onClick={(e) => {
-                    e.preventDefault();                 // hindari jump hash
+                    e.preventDefault();
                     const id = item.href.slice(1);
                     scrollToSection(id);
                   }}
-                  className={`px-3 py-2 rounded-full flex items-center space-x-1 transition-all duration-300 ${
+                  className={`flex items-center space-x-2 transition-all duration-300 ${
                     activeSection === item.href.slice(1) 
-                      ? 'text-primary bg-primary/10 shadow-primary/20' 
-                      : 'text-muted-foreground '
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'text-gray-300 hover:text-white hover:bg-gray-700'
                   }`}
                 >
                   <motion.span
@@ -104,18 +98,8 @@ export default function Header() {
                   >
                     <item.icon className="w-4 h-4" />
                   </motion.span>
-                  <span className="relative">
-                    {item.label}
-                    {activeSection === item.href.slice(1) && (
-                      <motion.span
-                        layoutId="activeSection"
-                        className="absolute inset-0"
-                        initial={false}
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </span>
-                </Link>
+                  <span>{item.label}</span>
+                </Button>
               </motion.div>
             ))}
           </nav>
@@ -126,14 +110,15 @@ export default function Header() {
               whileTap={{ scale: 0.9 }}
             >
               <Button 
-                variant="ghost" 
+                variant="outline"
                 size="icon" 
                 onClick={handleAdminClick}
-                className="transition-colors duration-300 hover:text-primary"
+                className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-700"
               >
-                <User className="h-[1.2rem] w-[1.2rem]" />
+                <User className="h-4 w-4" />
               </Button>
             </motion.div>
+            
             <motion.div
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -143,7 +128,7 @@ export default function Header() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(!isOpen)}
-                className="transition-colors duration-300 hover:text-primary"
+                className="text-gray-300 hover:text-white"
               >
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
@@ -153,7 +138,7 @@ export default function Header() {
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {isOpen ? <X className="h-[1.2rem] w-[1.2rem]" /> : <Menu className="h-[1.2rem] w-[1.2rem]" />}
+                    {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
                   </motion.div>
                 </AnimatePresence>
               </Button>
@@ -169,34 +154,33 @@ export default function Header() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-background/80 backdrop-blur-xl border-t border-border"
+            className="md:hidden bg-gray-800/80 backdrop-blur-xl border-t border-gray-700"
           >
-            <nav className="flex flex-col items-center py-4">
+            <nav className="max-w-7xl mx-auto px-6 py-4 space-y-2">
               {navItems.map((item, index) => (
                 <motion.div
                   key={item.href}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="w-full"
                 >
-                  <Link 
-                    href={item.href} 
-                    className={`py-2 px-4 w-full flex items-center space-x-2 transition-all duration-300 ${
+                  <Button
+                    variant={activeSection === item.href.slice(1) ? "secondary" : "ghost"}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const id = item.href.slice(1);
+                      scrollToSection(id);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full justify-start flex items-center space-x-2 ${
                       activeSection === item.href.slice(1) 
-                        ? 'text-primary bg-primary/10 shadow-lg shadow-primary/20' 
-                        : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
                     }`}
-                    onClick={() => setIsOpen(false)}
                   >
-                    <motion.span
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <item.icon className="w-4 h-4" />
-                    </motion.span>
+                    <item.icon className="w-4 h-4" />
                     <span>{item.label}</span>
-                  </Link>
+                  </Button>
                 </motion.div>
               ))}
             </nav>

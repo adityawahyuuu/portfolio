@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Briefcase, ChevronDown, ChevronUp } from "lucide-react"
 
@@ -23,90 +23,113 @@ export default function Experience({ data }: { data?: ExperienceItem[] }) {
   const experienceData = Object.values(data || {});
 
   return (
-    <section
-      id="experience"
-      className="py-20 bg-gradient-to-br from-indigo-900 via-purple-900 to-black relative overflow-hidden"
-    >
-      <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 backdrop-blur-sm"></div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-12 sm:mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"
-        >
+    <section id="experience" className="p-6">
+      <CardHeader>
+        <CardTitle className="text-2xl font-semibold text-white flex items-center">
+          <div className="p-2 rounded-lg mr-3 bg-purple-500">
+            <Briefcase className="w-5 h-5" />
+          </div>
           Professional Experience
-        </motion.h2>
+        </CardTitle>
+      </CardHeader>
 
-        <div className="relative max-w-4xl mx-auto">
-          {/* Timeline */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 rounded-full hidden sm:block"></div>
-
-          {experienceData.map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className={`mb-12 flex flex-col sm:flex-row ${
-                index % 2 === 0 ? "sm:justify-start" : "sm:justify-end"
-              } items-center sm:items-stretch`}
-            >
-              <Card className="w-full sm:w-[calc(50%-20px)] bg-gray-800/70 border-gray-700 backdrop-blur-md hover:border-blue-500 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-lg hover:shadow-blue-500/20">
-                <CardContent className="p-6">
-                  <motion.div
-                    className="flex items-center mb-4 cursor-pointer"
-                    onClick={() => toggleExpand(index)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
-                      <Briefcase className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-grow">
-                      <h3 className="text-lg sm:text-xl font-semibold text-white">{item.position}</h3>
-                      <p className="text-purple-300">{item.company}</p>
-                    </div>
-                    <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-300 transition-colors">
-                      {expandedIndex === index ? (
-                        <ChevronUp className="w-5 h-5" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5" />
-                      )}
-                    </Button>
-                  </motion.div>
-                  <p className="text-blue-300 mb-4 text-sm sm:text-base">{item.duration}</p>
-                  <AnimatePresence>
-                    {expandedIndex === index && (
-                      <motion.ul
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="list-disc list-inside space-y-2 overflow-hidden"
+      <CardContent className="space-y-6">
+        {experienceData.length > 0 ? (
+          <div className="space-y-4">
+            {experienceData.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className="bg-gray-700/50 border-gray-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
+                  <CardContent className="p-6">
+                    <motion.div
+                      className="flex items-center justify-between cursor-pointer"
+                      onClick={() => toggleExpand(index)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-center flex-grow">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                          <Briefcase className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-grow">
+                          <h3 className="text-lg font-semibold text-white">{item.position}</h3>
+                          <p className="text-purple-300 font-medium">{item.company}</p>
+                          <p className="text-purple-300/80 text-sm">{item.duration}</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors"
                       >
-                        {item.responsibilities.map((responsibility, idx) => (
-                          <motion.li
-                            key={idx}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.3, delay: idx * 0.1 }}
-                            className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-                          >
-                            {responsibility}
-                          </motion.li>
-                        ))}
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+                        {expandedIndex === index ? (
+                          <>
+                            <ChevronUp className="w-4 h-4 mr-2" />
+                            <span className="text-sm">Less</span>
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4 mr-2" />
+                            <span className="text-sm">More</span>
+                          </>
+                        )}
+                      </Button>
+                    </motion.div>
+
+                    <AnimatePresence>
+                      {expandedIndex === index && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="mt-4 pt-4 border-t border-gray-600 overflow-hidden"
+                        >
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-white flex items-center">
+                              <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                              Key Responsibilities
+                            </h4>
+                            <ul className="space-y-2 ml-4">
+                              {item.responsibilities.map((responsibility, idx) => (
+                                <motion.li
+                                  key={idx}
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.3, delay: idx * 0.1 }}
+                                  className="text-gray-300 hover:text-white transition-colors text-sm flex items-start"
+                                >
+                                  <div className="w-1 h-1 bg-purple-400 rounded-full mr-2 mt-2 flex-shrink-0"></div>
+                                  <span>{responsibility}</span>
+                                </motion.li>
+                              ))}
+                            </ul>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Briefcase className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-gray-400">No experience data available yet.</p>
+          </motion.div>
+        )}
+      </CardContent>
     </section>
   )
 }
