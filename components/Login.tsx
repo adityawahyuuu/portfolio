@@ -74,9 +74,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
       {/* Back to Home button - positioned absolutely */}
-      <Link 
+      <Link
         href="/"
         className="absolute top-8 left-8 z-10 flex items-center space-x-2 text-white/70 hover:text-white transition-all duration-300 group"
       >
@@ -90,15 +90,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       </Link>
 
       {/* Portfolio logo - positioned absolutely */}
-      <Link 
-        href="/" 
+      <Link
+        href="/"
         className="absolute top-8 right-8 z-10 text-xl font-bold transition-colors duration-300 hover:text-primary/80"
       >
         <motion.span
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-clip-text text-transparent bg-gradient-to-r from-pink-300 via-purple-300 to-white"
+          className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-green-500 to-white"
         >
           Portfolio
         </motion.span>
@@ -154,20 +154,20 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         transition={{ duration: 0.8 }}
         className="w-full max-w-md p-6"
       >
-        <Card className="relative overflow-hidden backdrop-blur-xl bg-white/10 border-white/20 shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-pink-500/10" />
+        <Card className="relative overflow-hidden backdrop-blur-xl bg-gray-800/50 border-gray-700 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-700/10 to-gray-900/10" />
 
           {/* Desert illustration */}
-          <div className="relative h-48 bg-gradient-to-b from-purple-900 to-pink-600 rounded-t-lg overflow-hidden">
+          <div className="relative h-48 bg-gradient-to-b from-gray-700 to-gray-900 rounded-t-lg overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center">
-              <Mountains className="w-24 h-24 text-purple-300/30" />
+              <Mountains className="w-24 h-24 text-gray-400/30" />
             </div>
             <motion.div
               animate={{ y: [0, -5, 0] }}
               transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
               className="absolute top-8 right-8"
             >
-              <Moon className="w-12 h-12 text-pink-200/80" />
+              <Moon className="w-12 h-12 text-green-400/80" />
             </motion.div>
             <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/20 to-transparent" />
           </div>
@@ -190,7 +190,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-pink-500 transition-colors"
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-green-500 focus:ring-green-500 transition-colors"
                 />
               </motion.div>
 
@@ -201,7 +201,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-pink-500 transition-colors"
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-green-500 focus:ring-green-500 transition-colors"
                 />
               </motion.div>
 
@@ -212,12 +212,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 className="flex items-center justify-between"
               >
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" className="border-white/20 data-[state=checked]:bg-pink-500" />
-                  <label htmlFor="remember" className="text-sm text-white/70">
+                  <Checkbox id="remember" className="border-gray-600 data-[state=checked]:bg-green-500" />
+                  <label htmlFor="remember" className="text-sm text-gray-400">
                     Remember me
                   </label>
                 </div>
-                <Button variant="link" className="text-sm text-pink-300 hover:text-pink-200">
+                <Button variant="link" className="text-sm text-green-400 hover:text-green-300">
                   Forgot password?
                 </Button>
               </motion.div>
@@ -226,7 +226,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700 transition-all duration-300"
                 >
                   {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Login"}
                 </Button>
@@ -238,9 +238,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 transition={{ delay: 0.7 }}
                 className="text-center mt-4"
               >
-                <span className="text-white/50 text-sm">
+                <span className="text-gray-400 text-sm">
                   Don&apos;t have an account?{" "}
-                  <Button variant="link" className="text-pink-300 hover:text-pink-200 p-0">
+                  <Button variant="link" className="text-green-400 hover:text-green-300 p-0">
                     Create Account
                   </Button>
                 </span>

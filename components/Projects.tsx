@@ -6,7 +6,8 @@ import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ChevronLeft, ChevronRight, Github, Eye, FolderOpen } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { ChevronLeft, ChevronRight, Github, Eye, FolderOpen, ExternalLink } from 'lucide-react'
 
 interface Project {
   name?: string;
@@ -19,7 +20,14 @@ interface Project {
 
 export default function Projects({ data }: { data?: Project[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const projectsPerPage = 6
+
+  const openProjectDetails = (project: Project) => {
+    setSelectedProject(project)
+    setIsDialogOpen(true)
+  }
 
   const nextProjects = () => {
     if (!data?.length) return;
@@ -83,46 +91,29 @@ export default function Projects({ data }: { data?: Project[] }) {
                         <h3 className="text-lg font-semibold mb-2 text-white group-hover:text-green-400 transition-colors duration-300">
                           {project.name || 'Untitled Project'}
                         </h3>
-                        <Badge 
-                          variant="outline" 
-                          className="bg-green-500/20 text-green-400 border-green-500/40"
-                        >
-                          Public
-                        </Badge>
                       </div>
 
-                      <p className="text-gray-400 text-center mb-4 text-sm line-clamp-3">
-                        {project.description || 'No description available'}
-                      </p>
-
                       <div className="flex justify-center gap-3">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
-                          className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/50 hover:text-blue-300 transition-all duration-300" 
-                          asChild
+                          onClick={() => openProjectDetails(project)}
+                          className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/50 hover:text-blue-300 transition-all duration-300"
                         >
-                          <a 
-                            href={project.path || '#'} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center space-x-2"
-                          >
-                            <Eye className="h-4 w-4" />
-                            <span>View</span>
-                          </a>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View
                         </Button>
-                        
+
                         {project.github && (
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
-                            className="bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border-purple-500/50 hover:text-purple-300 transition-all duration-300" 
+                            className="bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border-purple-500/50 hover:text-purple-300 transition-all duration-300"
                             asChild
                           >
-                            <a 
-                              href={project.github} 
-                              target="_blank" 
+                            <a
+                              href={project.github}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center space-x-2"
                             >
@@ -172,6 +163,157 @@ export default function Projects({ data }: { data?: Project[] }) {
           </div>
         )}
       </CardContent>
+
+      {/* Project Detail Modal */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-green-400 flex items-center">
+              <FolderOpen className="w-6 h-6 mr-2" />
+              {selectedProject?.name || 'Project Details'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Complete information about this project
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedProject && (
+            <div className="space-y-6">
+              {/* Project Image */}
+              {selectedProject.image && (
+                <div className="relative w-full h-64 rounded-lg overflow-hidden">
+                  <Image
+                    src={selectedProject.image}
+                    alt={selectedProject.name || 'Project Image'}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Project Information */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">Description</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    {selectedProject.description || 'No description available'}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-400 mb-2">Project Name</h3>
+                    <p className="text-gray-300">{selectedProject.name || 'Untitled'}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-400 mb-2">Path</h3>
+                    <p className="text-gray-300">{selectedProject.path || 'empty'}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">GitHub Repository</h3>
+                  {selectedProject.github ? (
+                    <a
+                      href={selectedProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 flex items-center gap-2 transition-colors"
+                    >
+                      <Github className="w-4 h-4" />
+                      {selectedProject.github}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  ) : (
+                    <p className="text-gray-400">N/A</p>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">Image URL</h3>
+                  {selectedProject.image ? (
+                    <a
+                      href={selectedProject.image}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 flex items-center gap-2 transition-colors break-all"
+                    >
+                      {selectedProject.image}
+                      <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                    </a>
+                  ) : (
+                    <p className="text-gray-400">N/A</p>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">Technologies Used</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProject.technologies && selectedProject.technologies.length > 0 ? (
+                      selectedProject.technologies.map((tech, idx) => (
+                        <Badge
+                          key={idx}
+                          variant="outline"
+                          className="text-sm px-3 py-1"
+                          style={{
+                            backgroundColor: `${tech.color}20`,
+                            borderColor: `${tech.color}50`,
+                            color: tech.color
+                          }}
+                        >
+                          {tech.name}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="text-gray-400">No technologies listed</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-gray-700">
+                {selectedProject.path && (
+                  <Button
+                    variant="outline"
+                    className="flex-1 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/50"
+                    asChild
+                  >
+                    <a
+                      href={selectedProject.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Visit Project
+                    </a>
+                  </Button>
+                )}
+
+                {selectedProject.github && (
+                  <Button
+                    variant="outline"
+                    className="flex-1 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border-purple-500/50"
+                    asChild
+                  >
+                    <a
+                      href={selectedProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Github className="w-4 h-4" />
+                      View Code
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

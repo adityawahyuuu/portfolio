@@ -26,6 +26,8 @@ interface FormData {
     path: string;
     image: string;
     description: string;
+    github?: string;
+    technologies?: Array<{ name: string; color: string }>;
   }>;
   experience: Array<{
     position: string;
@@ -124,7 +126,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     let newItem: any;
     switch (section) {
       case 'project':
-        newItem = { name: '', path: '', image: '', description: '' };
+        newItem = { name: '', path: '', image: '', description: '', github: '', technologies: [] };
         break;
       case 'experience':
         newItem = { position: '', company: '', duration: '', responsibilities: [''] };
@@ -204,27 +206,83 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setFormData(prev => {
       let experienceData = prev.experience;
       let experienceArray: any[] = [];
-      
+
       // Convert object to array if needed (Firebase sometimes returns objects)
       if (experienceData && !Array.isArray(experienceData) && typeof experienceData === 'object') {
         experienceArray = Object.values(experienceData);
       } else if (Array.isArray(experienceData)) {
         experienceArray = experienceData;
       }
-      
+
       // Create a copy of the array
       const updatedExperience = [...experienceArray];
-      
+
       if (updatedExperience[expIndex]) {
         const currentResponsibilities = updatedExperience[expIndex].responsibilities || [];
         const responsibilitiesArray = Array.isArray(currentResponsibilities) ? currentResponsibilities : [];
-        
+
         updatedExperience[expIndex] = {
           ...updatedExperience[expIndex],
           responsibilities: responsibilitiesArray.filter((_, i) => i !== respIndex)
         };
       }
       return { ...prev, experience: updatedExperience };
+    });
+  }
+
+  const handleAddTechnology = (index: number) => {
+    setFormData(prev => {
+      let projectData = prev.project;
+      let projectArray: any[] = [];
+
+      // Convert object to array if needed (Firebase sometimes returns objects)
+      if (projectData && !Array.isArray(projectData) && typeof projectData === 'object') {
+        projectArray = Object.values(projectData);
+      } else if (Array.isArray(projectData)) {
+        projectArray = projectData;
+      }
+
+      // Create a copy of the array
+      const updatedProjects = [...projectArray];
+
+      if (updatedProjects[index]) {
+        const currentTechnologies = updatedProjects[index].technologies || [];
+        const technologiesArray = Array.isArray(currentTechnologies) ? currentTechnologies : [];
+
+        updatedProjects[index] = {
+          ...updatedProjects[index],
+          technologies: [...technologiesArray, { name: '', color: '#10b981' }]
+        };
+      }
+      return { ...prev, project: updatedProjects };
+    });
+  }
+
+  const handleDeleteTechnology = (projectIndex: number, techIndex: number) => {
+    setFormData(prev => {
+      let projectData = prev.project;
+      let projectArray: any[] = [];
+
+      // Convert object to array if needed (Firebase sometimes returns objects)
+      if (projectData && !Array.isArray(projectData) && typeof projectData === 'object') {
+        projectArray = Object.values(projectData);
+      } else if (Array.isArray(projectData)) {
+        projectArray = projectData;
+      }
+
+      // Create a copy of the array
+      const updatedProjects = [...projectArray];
+
+      if (updatedProjects[projectIndex]) {
+        const currentTechnologies = updatedProjects[projectIndex].technologies || [];
+        const technologiesArray = Array.isArray(currentTechnologies) ? currentTechnologies : [];
+
+        updatedProjects[projectIndex] = {
+          ...updatedProjects[projectIndex],
+          technologies: technologiesArray.filter((_: any, i: number) => i !== techIndex)
+        };
+      }
+      return { ...prev, project: updatedProjects };
     });
   }
 
@@ -362,7 +420,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   projectData = [];
                 }
                 
-                return projectData.map((project: {name: string, path: string, image: string, description: string}, index: number) => (
+                return projectData.map((project: {name: string, path: string, image: string, description: string, github?: string, technologies?: Array<{ name: string; color: string }>}, index: number) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: -20 }}
@@ -383,7 +441,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                         Delete
                       </Button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input
                         value={project.name || ''}
@@ -398,14 +456,21 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                         className={commonInputClasses}
                       />
                     </div>
-                    
+
                     <Input
                       value={project.image || ''}
                       onChange={(e) => handleArrayChange('project', index, 'image', e.target.value)}
                       placeholder="Project image URL"
                       className={commonInputClasses}
                     />
-                    
+
+                    <Input
+                      value={project.github || ''}
+                      onChange={(e) => handleArrayChange('project', index, 'github', e.target.value)}
+                      placeholder="GitHub repository URL"
+                      className={commonInputClasses}
+                    />
+
                     <Textarea
                       value={project.description || ''}
                       onChange={(e) => handleArrayChange('project', index, 'description', e.target.value)}
@@ -413,6 +478,66 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       rows={3}
                       className={commonInputClasses}
                     />
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-md font-medium text-white">Technologies</h5>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAddTechnology(index)}
+                          className="border-gray-600 text-white hover:bg-gray-600"
+                        >
+                          <Plus className="h-4 w-4 mr-2" /> Add Technology
+                        </Button>
+                      </div>
+
+                      {(() => {
+                        let technologies = project.technologies || [];
+
+                        // Ensure technologies is always an array
+                        if (!Array.isArray(technologies)) {
+                          technologies = [];
+                        }
+
+                        return technologies.map((tech: { name: string; color: string }, techIndex: number) => (
+                          <div key={techIndex} className="grid grid-cols-1 md:grid-cols-3 gap-2 items-start">
+                            <Input
+                              value={tech.name || ''}
+                              onChange={(e) => {
+                                const newTechnologies = [...technologies];
+                                newTechnologies[techIndex] = { ...newTechnologies[techIndex], name: e.target.value };
+                                handleArrayChange('project', index, 'technologies', newTechnologies);
+                              }}
+                              placeholder={`Technology ${techIndex + 1} name`}
+                              className={`${commonInputClasses} md:col-span-2`}
+                            />
+                            <div className="flex gap-2">
+                              <Input
+                                type="color"
+                                value={tech.color || '#10b981'}
+                                onChange={(e) => {
+                                  const newTechnologies = [...technologies];
+                                  newTechnologies[techIndex] = { ...newTechnologies[techIndex], color: e.target.value };
+                                  handleArrayChange('project', index, 'technologies', newTechnologies);
+                                }}
+                                className={`${commonInputClasses} w-16 h-10 cursor-pointer`}
+                                title="Pick a color"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteTechnology(index, techIndex)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
                   </motion.div>
                 ));
               })()}
