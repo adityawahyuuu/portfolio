@@ -12,7 +12,7 @@ import { ChevronLeft, ChevronRight, Github, Eye, FolderOpen, ExternalLink } from
 interface Project {
   name?: string;
   path?: string;
-  image?: string;
+  images?: string[];
   description?: string;
   technologies?: { name: string; color: string }[];
   github?: string;
@@ -22,10 +22,12 @@ export default function Projects({ data }: { data?: Project[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [sliderIndex, setSliderIndex] = useState(0)
   const projectsPerPage = 6
 
   const openProjectDetails = (project: Project) => {
     setSelectedProject(project)
+    setSliderIndex(0)
     setIsDialogOpen(true)
   }
 
@@ -78,7 +80,7 @@ export default function Projects({ data }: { data?: Project[] }) {
                   <Card className="group bg-gray-700/50 border-gray-600 hover:border-green-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 overflow-hidden">
                     <div className="relative h-48 overflow-hidden">
                       <Image
-                        src={project.image || '/placeholder.svg?height=200&width=250'}
+                        src={project.images?.[0] ?? '/asset/projects/window.svg'}
                         alt={project.name || 'Untitled Project'}
                         fill
                         className="object-cover transition-transform duration-500 transform group-hover:scale-110"
@@ -179,17 +181,46 @@ export default function Projects({ data }: { data?: Project[] }) {
 
           {selectedProject && (
             <div className="space-y-6">
-              {/* Project Image */}
-              {selectedProject.image && (
-                <div className="relative w-full h-64 rounded-lg overflow-hidden">
-                  <Image
-                    src={selectedProject.image}
-                    alt={selectedProject.name || 'Project Image'}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+              {/* Image Slider */}
+              {(() => {
+                const imgs = selectedProject.images?.length ? selectedProject.images : [];
+                if (imgs.length === 0) return null;
+                return (
+                  <div className="relative w-full h-64 rounded-lg overflow-hidden bg-gray-900">
+                    <Image
+                      src={imgs[sliderIndex]}
+                      alt={`${selectedProject.name} image ${sliderIndex + 1}`}
+                      fill
+                      className="object-cover transition-opacity duration-300"
+                    />
+                    {imgs.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setSliderIndex(i => (i - 1 + imgs.length) % imgs.length)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setSliderIndex(i => (i + 1) % imgs.length)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                          {imgs.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setSliderIndex(i)}
+                              className={`w-2 h-2 rounded-full transition-colors ${i === sliderIndex ? 'bg-white' : 'bg-white/40'}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Project Information */}
               <div className="space-y-4">

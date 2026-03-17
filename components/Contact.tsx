@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { ContactData, FormData } from "@/types/contact";
 import { useState } from 'react';
-import { Github, Linkedin, Twitter, Mail, Phone, Loader2, CheckCircle, Paperclip, X } from 'lucide-react';
+import { Github, Linkedin, Twitter, Mail, Loader2, CheckCircle, Paperclip, X } from 'lucide-react';
+import Image from 'next/image';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -354,33 +355,42 @@ export default function Contact({ data }: { data?: ContactData }) {
           </Card>
 
           {/* Contact Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-            <Card className="bg-gray-700/50 border-gray-600 hover:border-pink-500/50 transition-colors">
-              <CardContent className="p-4 text-center">
-                <Mail className="w-8 h-8 text-pink-400 mx-auto mb-2" />
-                <p className="text-gray-300 text-sm">Email</p>
-                <a 
-                  href="mailto:pradhanaaditya30@gmail.com" 
-                  className="text-white hover:text-pink-300 transition-colors text-sm"
-                >
-                  pradhanaaditya30@gmail.com
+          {(() => {
+            const email = data?.email || 'pradhanaaditya30@gmail.com';
+            const phone = String(data?.phone || '+62 81315227951');
+            const waNumber = phone.replace(/\D/g, '');
+            const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo, saya ingin menghubungi Anda.')}`;
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <a href={`mailto:${email}`} className="block">
+                  <Card className="bg-gray-700/50 border-gray-600 hover:border-pink-500/50 transition-colors cursor-pointer">
+                    <CardContent className="p-4 text-center">
+                      <Mail className="w-8 h-8 text-pink-400 mx-auto mb-2" />
+                      <p className="text-gray-300 text-sm">Email</p>
+                      <p className="text-white text-sm">{email}</p>
+                    </CardContent>
+                  </Card>
                 </a>
-              </CardContent>
-            </Card>
 
-            <Card className="bg-gray-700/50 border-gray-600 hover:border-pink-500/50 transition-colors">
-              <CardContent className="p-4 text-center">
-                <Phone className="w-8 h-8 text-pink-400 mx-auto mb-2" />
-                <p className="text-gray-300 text-sm">Phone</p>
-                <a 
-                  href="tel:+6281315227951" 
-                  className="text-white hover:text-pink-300 transition-colors text-sm"
-                >
-                  +62 81315227951
+                <a href={waUrl} target="_blank" rel="noopener noreferrer" className="block">
+                  <Card className="bg-gray-700/50 border-gray-600 hover:border-pink-500/50 transition-colors cursor-pointer">
+                    <CardContent className="p-4 text-center">
+                      <div className="flex justify-center mb-2">
+                        <Image
+                          src="/WhatsAppButtonGreenMedium.svg"
+                          alt="WhatsApp"
+                          width={148}
+                          height={32}
+                        />
+                      </div>
+                      <p className="text-gray-300 text-sm">WhatsApp</p>
+                      <p className="text-white text-sm">{phone}</p>
+                    </CardContent>
+                  </Card>
                 </a>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            );
+          })()}
 
           {/* Social Links */}
           {data?.socialLinks && data.socialLinks.length > 0 && (

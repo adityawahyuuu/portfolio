@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import { database } from '../lib/firebase'
 import { ref, set, get } from 'firebase/database'
-import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Briefcase } from 'lucide-react'
+import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Briefcase, Upload } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -24,7 +25,7 @@ interface FormData {
   project: Array<{
     name: string;
     path: string;
-    image: string;
+    images?: string[];
     description: string;
     github?: string;
     technologies?: Array<{ name: string; color: string }>;
@@ -66,7 +67,63 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [formData, setFormData] = useState<FormData>(defaultData);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
   const { toast } = useToast()
+
+  const handleImageUpload = async (files: FileList, projectIndex: number) => {
+    if (!files || files.length === 0) return;
+    setUploadingIndex(projectIndex);
+    try {
+      const form = new FormData();
+      Array.from(files).forEach(file => form.append('files', file));
+      const res = await fetch('/api/upload', { method: 'POST', body: form });
+      if (!res.ok) throw new Error('Upload failed');
+      const { paths } = await res.json();
+
+      let projectData = formData.project || [];
+      if (!Array.isArray(projectData)) projectData = Object.values(projectData);
+      const currentProject = projectData[projectIndex];
+      const existing = currentProject?.images || [];
+      handleArrayChange('project', projectIndex, 'images', [...existing, ...paths]);
+      toast({ title: 'Uploaded', description: `${paths.length} file(s) uploaded.` });
+    } catch {
+      toast({ title: 'Upload Failed', description: 'Could not upload image.', variant: 'destructive' });
+    } finally {
+      setUploadingIndex(null);
+    }
+  }
+
+  const handleDeleteImage = async (projectIndex: number, imgIndex: number) => {
+    let projectData = formData.project || [];
+    if (!Array.isArray(projectData)) projectData = Object.values(projectData);
+    const currentProject = projectData[projectIndex];
+    const existing = currentProject?.images || [];
+
+    const fileToDelete = existing[imgIndex];
+    if (fileToDelete?.startsWith('/asset/projects/')) {
+      try {
+        await fetch('/api/upload', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: fileToDelete }),
+        });
+      } catch {
+        // lanjut walau delete file gagal
+      }
+    }
+
+    const updated = existing.filter((_: string, i: number) => i !== imgIndex);
+    setFormData(prev => {
+      let projectArr = prev.project || [];
+      if (!Array.isArray(projectArr)) projectArr = Object.values(projectArr);
+      const updatedProjects = [...projectArr];
+      updatedProjects[projectIndex] = {
+        ...updatedProjects[projectIndex],
+        images: updated,
+      };
+      return { ...prev, project: updatedProjects };
+    });
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,7 +167,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     });
   }
 
-  const handleArrayChange = (section: keyof FormData, index: number, key: string, value: string | string[]) => {
+  const handleArrayChange = (section: keyof FormData, index: number, key: string, value: string | string[] | Array<Record<string, string>>) => {
     setFormData(prev => {
       if (Array.isArray(prev[section])) {
         const sectionArray = [...prev[section]];
@@ -457,12 +514,52 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       />
                     </div>
 
-                    <Input
-                      value={project.image || ''}
-                      onChange={(e) => handleArrayChange('project', index, 'image', e.target.value)}
-                      placeholder="Project image URL"
-                      className={commonInputClasses}
-                    />
+                    <div className="space-y-2">
+                      <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700/50 hover:bg-gray-700 transition-all">
+                        <div className="flex flex-col items-center justify-center py-3">
+                          {uploadingIndex === index ? (
+                            <p className="text-sm text-gray-400">Uploading...</p>
+                          ) : (
+                            <>
+                              <Upload className="w-6 h-6 mb-1 text-gray-400" />
+                              <p className="text-sm text-gray-400">
+                                <span className="font-semibold">Click to upload</span> — multiple files supported
+                              </p>
+                              <p className="text-xs text-gray-500">PNG, JPG, WEBP</p>
+                            </>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => e.target.files && handleImageUpload(e.target.files, index)}
+                          disabled={uploadingIndex === index}
+                        />
+                      </label>
+                      {(() => {
+                        const imgs = project.images || [];
+                        return imgs.length > 0 && (
+                          <div className="grid grid-cols-3 gap-2">
+                            {imgs.map((src: string, imgIdx: number) => (
+                              <div key={imgIdx} className="relative group rounded overflow-hidden bg-gray-700">
+                                <div className="relative w-full h-20">
+                                  <Image src={src} alt={`img-${imgIdx}`} fill className="object-cover" />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteImage(index, imgIdx)}
+                                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </div>
 
                     <Input
                       value={project.github || ''}
@@ -484,10 +581,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                         <h5 className="text-md font-medium text-white">Technologies</h5>
                         <Button
                           type="button"
-                          variant="outline"
                           size="sm"
                           onClick={() => handleAddTechnology(index)}
-                          className="border-gray-600 text-white hover:bg-gray-600"
+                          className="bg-green-600 hover:bg-green-500 text-white border-0"
                         >
                           <Plus className="h-4 w-4 mr-2" /> Add Technology
                         </Button>
@@ -543,11 +639,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               })()}
             </AnimatePresence>
             
-            <Button 
-              type="button" 
-              onClick={() => handleAddItem('project')} 
-              variant="outline"
-              className="w-full border-gray-600 text-white hover:bg-gray-700"
+            <Button
+              type="button"
+              onClick={() => handleAddItem('project')}
+              className="w-full bg-green-700 hover:bg-green-600 text-white border-0"
             >
               <Plus className="h-4 w-4 mr-2" /> Add Project
             </Button>
@@ -627,10 +722,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                         <h5 className="text-md font-medium text-white">Responsibilities</h5>
                         <Button
                           type="button"
-                          variant="outline"
                           size="sm"
                           onClick={() => handleAddResponsibility(index)}
-                          className="border-gray-600 text-white hover:bg-gray-600"
+                          className="bg-purple-600 hover:bg-purple-500 text-white border-0"
                         >
                           <Plus className="h-4 w-4 mr-2" /> Add Responsibility
                         </Button>
@@ -673,11 +767,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               })()}
             </AnimatePresence>
             
-            <Button 
-              type="button" 
-              onClick={() => handleAddItem('experience')} 
-              variant="outline"
-              className="w-full border-gray-600 text-white hover:bg-gray-700"
+            <Button
+              type="button"
+              onClick={() => handleAddItem('experience')}
+              className="w-full bg-purple-700 hover:bg-purple-600 text-white border-0"
             >
               <Plus className="h-4 w-4 mr-2" /> Add Experience
             </Button>
@@ -722,10 +815,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             </Link>
           </div>
           
-          <Button 
-            onClick={onLogout} 
-            variant="outline"
-            className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+          <Button
+            onClick={onLogout}
+            className="bg-red-600 hover:bg-red-500 text-white border-0 shadow-md shadow-red-900/50"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Logout

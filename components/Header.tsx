@@ -109,11 +109,10 @@ export default function Header() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <Button 
-                variant="outline"
-                size="icon" 
+              <Button
+                size="icon"
                 onClick={handleAdminClick}
-                className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-700"
+                className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 border-0 shadow-md shadow-purple-500/30"
               >
                 <User className="h-4 w-4" />
               </Button>

@@ -6,6 +6,8 @@ export interface SocialLink {
   
   export interface ContactData {
     socialLinks: SocialLink[];
+    email?: string;
+    phone?: string;
   }
   
   export interface FormData {

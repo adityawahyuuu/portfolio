@@ -12,7 +12,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-import { Checkbox } from "@/components/ui/checkbox"
 
 interface LoginProps {
   onLoginSuccess: () => void
@@ -205,22 +204,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 />
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex items-center justify-between"
-              >
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" className="border-gray-600 data-[state=checked]:bg-green-500" />
-                  <label htmlFor="remember" className="text-sm text-gray-400">
-                    Remember me
-                  </label>
-                </div>
-                <Button variant="link" className="text-sm text-green-400 hover:text-green-300">
-                  Forgot password?
-                </Button>
-              </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
                 <Button
@@ -232,19 +215,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 </Button>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="text-center mt-4"
-              >
-                <span className="text-gray-400 text-sm">
-                  Don&apos;t have an account?{" "}
-                  <Button variant="link" className="text-green-400 hover:text-green-300 p-0">
-                    Create Account
-                  </Button>
-                </span>
-              </motion.div>
             </form>
           </CardContent>
         </Card>

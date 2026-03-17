@@ -1,6 +1,6 @@
 "use client"
 
-import { FaLinkedinIn, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { FaLinkedinIn, FaGithub } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 export default function Footer() {
@@ -41,12 +41,6 @@ export default function Footer() {
                                 href: "https://github.com/adityawahyuuu", 
                                 color: "hover:text-gray-300",
                                 label: "GitHub"
-                            },
-                            { 
-                                icon: FaEnvelope, 
-                                href: "mailto:pradhanaaditya30@gmail.com", 
-                                color: "hover:text-pink-400",
-                                label: "Email"
                             },
                         ].map((item, index) => (
                             <motion.a 
