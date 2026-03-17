@@ -38,76 +38,91 @@ export async function POST(request: NextRequest) {
       contentType: attachment.contentType,
     })) : [];
 
-    // Create attachment summary for email body
-    const attachmentSummary = attachments && attachments.length > 0 
-      ? `
-        <div style="margin-top: 20px; padding: 15px; background-color: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
-          <h4 style="color: #0c4a6e; margin-top: 0;">📎 Attachments (${attachments.length})</h4>
-          <ul style="margin: 10px 0; padding-left: 20px;">
-            ${attachments.map((att: any) => `
-              <li style="margin: 5px 0; color: #0369a1;">
-                <strong>${att.filename}</strong> 
-                <span style="color: #64748b; font-size: 12px;">(${(att.size / 1024).toFixed(1)} KB)</span>
-              </li>
-            `).join('')}
-          </ul>
-        </div>
-      ` 
+    const receivedAt = new Date().toLocaleString('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const attachmentRows = attachments?.length
+      ? attachments.map((att: any) => `
+          <tr>
+            <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#555;">${att.filename}</td>
+            <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#999;text-align:right;">${(att.size / 1024).toFixed(1)} KB</td>
+          </tr>`).join('')
       : '';
 
+    const attachmentSection = attachments?.length ? `
+      <tr><td style="padding:24px 40px 0;">
+        <p style="margin:0 0 10px;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#999;">Attachments</p>
+        <table width="100%" cellpadding="0" cellspacing="0">${attachmentRows}</table>
+      </td></tr>` : '';
+
     const mailOptions = {
-      from: user,
+      from: `"Portfolio Aditya Wahyu Pradhana" <${user}>`,
       to: 'pradhanaaditya30@gmail.com',
-      replyTo: email,
-      subject: `[IMPORTANT] New Contact Form Message from ${name}${attachments?.length ? ' (with attachments)' : ''}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px 8px 0 0;">
-            <h1 style="color: white; margin: 0; font-size: 24px;">New Contact Form Message</h1>
-            <p style="color: #e2e8f0; margin: 5px 0 0 0;">From your portfolio website</p>
-          </div>
-          
-          <div style="background-color: #ffffff; padding: 30px; border: 1px solid #e2e8f0;">
-            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3 style="color: #1e293b; margin-top: 0; font-size: 18px;">📋 Contact Information</h3>
-              <p style="margin: 8px 0;"><strong>Name:</strong> ${name}</p>
-              <p style="margin: 8px 0;"><strong>Email:</strong> 
-                <a href="mailto:${email}" style="color: #4f46e5; text-decoration: none;">${email}</a>
-              </p>
-            </div>
-            
-            <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-              <h3 style="color: #1e293b; margin-top: 0; font-size: 18px;">💬 Message</h3>
-              <p style="white-space: pre-wrap; line-height: 1.6; color: #374151;">${message}</p>
-            </div>
-            
-            ${attachmentSummary}
-            
-            <div style="margin-top: 20px; padding: 15px; background-color: #ecfdf5; border-radius: 8px;">
-              <p style="color: #059669; margin: 0; font-weight: 500;">
-                💡 Click "Reply" to respond directly to ${name}
-              </p>
-            </div>
-          </div>
-          
-          <div style="background-color: #f8fafc; padding: 15px; text-align: center; border-radius: 0 0 8px 8px;">
-            <p style="color: #64748b; margin: 0; font-size: 14px;">
-              This email was sent from your portfolio contact form
-            </p>
-            ${attachments?.length ? 
-              `<p style="color: #64748b; margin: 5px 0 0 0; font-size: 12px;">
-                Total attachment size: ${(attachments.reduce((sum: number, att: any) => sum + att.size, 0) / 1024 / 1024).toFixed(2)} MB
-              </p>` 
-              : ''
-            }
-          </div>
-        </div>
-      `,
+      replyTo: `"${name}" <${email}>`,
+      subject: `Message from ${name}`,
+      html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:48px 20px;">
+  <tr><td align="center">
+    <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#fff;border:1px solid #e8e8e8;border-radius:4px;">
+
+      <!-- Top accent -->
+      <tr><td style="height:3px;background:#1a1a1a;border-radius:4px 4px 0 0;"></td></tr>
+
+      <!-- Header -->
+      <tr><td style="padding:32px 40px 24px;">
+        <p style="margin:0;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#999;">Portfolio Contact</p>
+        <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;color:#1a1a1a;line-height:1.3;">You received a new message</h1>
+      </td></tr>
+
+      <!-- Divider -->
+      <tr><td style="padding:0 40px;"><hr style="border:none;border-top:1px solid #f0f0f0;margin:0;"></td></tr>
+
+      <!-- Sender -->
+      <tr><td style="padding:24px 40px 0;">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#999;">From</p>
+        <p style="margin:0;font-size:15px;font-weight:600;color:#1a1a1a;">${name}</p>
+        <p style="margin:3px 0 0;font-size:13px;color:#666;">
+          <a href="mailto:${email}" style="color:#1a1a1a;text-decoration:underline;">${email}</a>
+        </p>
+      </td></tr>
+
+      <!-- Message -->
+      <tr><td style="padding:24px 40px 0;">
+        <p style="margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#999;">Message</p>
+        <p style="margin:0;font-size:14px;line-height:1.8;color:#333;white-space:pre-wrap;background:#fafafa;border-left:2px solid #1a1a1a;padding:16px 20px;">${message}</p>
+      </td></tr>
+
+      ${attachmentSection}
+
+      <!-- Reply button -->
+      <tr><td style="padding:28px 40px;">
+        <a href="mailto:${email}?subject=Re:%20Your%20message" style="display:inline-block;background:#1a1a1a;color:#fff;font-size:13px;font-weight:500;text-decoration:none;padding:10px 22px;border-radius:3px;">Reply</a>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="padding:16px 40px 24px;border-top:1px solid #f0f0f0;">
+        <p style="margin:0;font-size:12px;color:#bbb;">Received ${receivedAt} WIB via portfolio contact form</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body></html>`,
       attachments: emailAttachments,
       headers: {
         'X-Priority': '1',
         'X-MSMail-Priority': 'High',
         'Importance': 'high',
+        'X-GM-LABELS': '\\Starred',
       },
     };
 
