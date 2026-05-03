@@ -6,7 +6,6 @@ import { ref, set, get } from 'firebase/database'
 import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Briefcase, Upload } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -544,8 +543,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                           <div className="grid grid-cols-3 gap-2">
                             {imgs.map((src: string, imgIdx: number) => (
                               <div key={imgIdx} className="relative group rounded overflow-hidden bg-gray-700">
-                                <div className="relative w-full h-20">
-                                  <Image src={src} alt={`img-${imgIdx}`} fill className="object-cover" />
+                                <div className="relative w-full h-20 overflow-hidden">
+                                  <img src={src} alt={`img-${imgIdx}`} className="w-full h-full object-cover" />
                                 </div>
                                 <button
                                   type="button"
