@@ -52,29 +52,29 @@ export default function Experience({ data }: { data?: ExperienceItem[] }) {
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="flex items-center flex-grow">
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
-                          <Briefcase className="w-6 h-6 text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mr-3 sm:mr-4 shadow-lg flex-shrink-0">
+                          <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
-                        <div className="flex-grow">
-                          <h3 className="text-lg font-semibold text-white">{item.position}</h3>
-                          <p className="text-purple-300 font-medium">{item.company}</p>
+                        <div className="flex-grow min-w-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-white truncate">{item.position}</h3>
+                          <p className="text-purple-300 font-medium text-sm sm:text-base truncate">{item.company}</p>
                           <p className="text-purple-300/80 text-sm">{item.duration}</p>
                         </div>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors flex-shrink-0"
                       >
                         {expandedIndex === index ? (
                           <>
-                            <ChevronUp className="w-4 h-4 mr-2" />
-                            <span className="text-sm">Less</span>
+                            <ChevronUp className="w-4 h-4 sm:mr-2" />
+                            <span className="hidden sm:inline text-sm">Less</span>
                           </>
                         ) : (
                           <>
-                            <ChevronDown className="w-4 h-4 mr-2" />
-                            <span className="text-sm">More</span>
+                            <ChevronDown className="w-4 h-4 sm:mr-2" />
+                            <span className="hidden sm:inline text-sm">More</span>
                           </>
                         )}
                       </Button>

@@ -16,6 +16,7 @@ interface Project {
   description?: string;
   technologies?: { name: string; color: string }[];
   github?: string;
+  owner?: string;
 }
 
 export default function Projects({ data }: { data?: Project[] }) {
@@ -80,7 +81,7 @@ export default function Projects({ data }: { data?: Project[] }) {
                   <Card className="group bg-gray-700/50 border-gray-600 hover:border-green-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 overflow-hidden">
                     <div className="relative h-48 overflow-hidden">
                       <Image
-                        src={project.images?.[0] ?? '/asset/projects/window.svg'}
+                        src={project.images?.[0] ?? '/asset/WIP-banner.jpeg'}
                         alt={project.name || 'Untitled Project'}
                         fill
                         className="object-cover transition-transform duration-500 transform group-hover:scale-110"
@@ -168,7 +169,7 @@ export default function Projects({ data }: { data?: Project[] }) {
 
       {/* Project Detail Modal */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-gray-800 border-gray-700 text-white w-[92vw] max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-green-400 flex items-center">
               <FolderOpen className="w-6 h-6 mr-2" />
@@ -183,8 +184,7 @@ export default function Projects({ data }: { data?: Project[] }) {
             <div className="space-y-6">
               {/* Image Slider */}
               {(() => {
-                const imgs = selectedProject.images?.length ? selectedProject.images : [];
-                if (imgs.length === 0) return null;
+                const imgs = selectedProject.images?.length ? selectedProject.images : ['/asset/WIP-banner.jpeg'];
                 return (
                   <div className="relative w-full h-64 rounded-lg overflow-hidden bg-gray-900">
                     <Image
@@ -225,6 +225,11 @@ export default function Projects({ data }: { data?: Project[] }) {
               {/* Project Information */}
               <div className="space-y-4">
                 <div>
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">Project Owner</h3>
+                  <p className="text-gray-300">{selectedProject.owner || 'N/A'}</p>
+                </div>
+
+                <div>
                   <h3 className="text-lg font-semibold text-green-400 mb-2">Description</h3>
                   <p className="text-gray-300 leading-relaxed">
                     {selectedProject.description || 'No description available'}
@@ -238,44 +243,22 @@ export default function Projects({ data }: { data?: Project[] }) {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-green-400 mb-2">Path</h3>
-                    <p className="text-gray-300">{selectedProject.path || 'empty'}</p>
+                    <h3 className="text-lg font-semibold text-green-400 mb-2">URL</h3>
+                    <p className="text-gray-300 flex items-center gap-2">
+                      {selectedProject.path
+                        ? <><span>{selectedProject.path}</span><a href={selectedProject.path} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors"><ExternalLink className="w-4 h-4" /></a></>
+                        : <em><strong>coming soon</strong></em>}
+                    </p>
                   </div>
                 </div>
 
                 <div>
                   <h3 className="text-lg font-semibold text-green-400 mb-2">GitHub Repository</h3>
-                  {selectedProject.github ? (
-                    <a
-                      href={selectedProject.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 flex items-center gap-2 transition-colors"
-                    >
-                      <Github className="w-4 h-4" />
-                      {selectedProject.github}
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  ) : (
-                    <p className="text-gray-400">N/A</p>
-                  )}
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-green-400 mb-2">Image URL</h3>
-                  {selectedProject.image ? (
-                    <a
-                      href={selectedProject.image}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 flex items-center gap-2 transition-colors break-all"
-                    >
-                      {selectedProject.image}
-                      <ExternalLink className="w-4 h-4 flex-shrink-0" />
-                    </a>
-                  ) : (
-                    <p className="text-gray-400">N/A</p>
-                  )}
+                  <p className="text-gray-300 flex items-center gap-2">
+                    {selectedProject.github
+                      ? <><span>{selectedProject.github}</span><a href={selectedProject.github} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors"><Github className="w-4 h-4" /></a></>
+                      : <p className="text-gray-400">non disclosure information</p>}
+                  </p>
                 </div>
 
                 <div>
@@ -297,50 +280,12 @@ export default function Projects({ data }: { data?: Project[] }) {
                         </Badge>
                       ))
                     ) : (
-                      <p className="text-gray-400">No technologies listed</p>
+                      <p className="text-gray-400">non disclosure information</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-gray-700">
-                {selectedProject.path && (
-                  <Button
-                    variant="outline"
-                    className="flex-1 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/50"
-                    asChild
-                  >
-                    <a
-                      href={selectedProject.path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Visit Project
-                    </a>
-                  </Button>
-                )}
-
-                {selectedProject.github && (
-                  <Button
-                    variant="outline"
-                    className="flex-1 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border-purple-500/50"
-                    asChild
-                  >
-                    <a
-                      href={selectedProject.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <Github className="w-4 h-4" />
-                      View Code
-                    </a>
-                  </Button>
-                )}
-              </div>
             </div>
           )}
         </DialogContent>

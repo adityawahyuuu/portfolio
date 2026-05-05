@@ -8,7 +8,7 @@ export const metadata = {
   title: 'My Personal Portfolio',
   description: 'My Portfolio',
   icons: {
-    icon: '/portfolio.png',
+    icon: '/asset/favicon.png',
   },
 }
 

@@ -43,7 +43,7 @@ export default function Services({ data }: { data?: Service[] }) {
   return (
     <section
       id="services"
-      className="py-24 bg-gradient-to-br from-indigo-900 via-purple-900 to-black relative overflow-hidden"
+      className="py-16 lg:py-24 bg-gradient-to-br from-indigo-900 via-purple-900 to-black relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 backdrop-blur-sm"></div>
@@ -53,9 +53,9 @@ export default function Services({ data }: { data?: Service[] }) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-12 lg:mb-20"
         >
-          <h2 className="text-7xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+          <h2 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
             Our Services
           </h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -104,7 +104,7 @@ export default function Services({ data }: { data?: Service[] }) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-20 text-center"
+          className="mt-12 lg:mt-20 text-center"
         >
           <Button
             size="lg"

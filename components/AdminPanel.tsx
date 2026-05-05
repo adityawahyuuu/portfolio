@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { database } from '../lib/firebase'
 import { ref, set, get } from 'firebase/database'
 import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Briefcase, Upload } from 'lucide-react'
+import { TECH_ICONS } from '@/lib/techIcons'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,7 +20,7 @@ interface FormData {
     image: string;
     description1: string;
     description2: string;
-    skills: Array<{ text: string; color: string }>;
+    skills: Array<{ text: string; color: string; techStack?: Array<{ name: string }>; workflow?: string[] }>;
   };
   project: Array<{
     name: string;
@@ -27,6 +28,7 @@ interface FormData {
     images?: string[];
     description: string;
     github?: string;
+    owner?: string;
     technologies?: Array<{ name: string; color: string }>;
   }>;
   experience: Array<{
@@ -67,7 +69,16 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [pendingTechs, setPendingTechs] = useState<Record<number, string>>({});
   const { toast } = useToast()
+
+  const handleSkillUpdate = (skillIndex: number, key: string, value: any) => {
+    setFormData(prev => {
+      const skills = Array.isArray(prev.home?.skills) ? [...prev.home.skills] : []
+      skills[skillIndex] = { ...skills[skillIndex], [key]: value }
+      return { ...prev, home: { ...prev.home, skills } }
+    })
+  }
 
   const handleImageUpload = async (files: FileList, projectIndex: number) => {
     if (!files || files.length === 0) return;
@@ -182,7 +193,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     let newItem: any;
     switch (section) {
       case 'project':
-        newItem = { name: '', path: '', image: '', description: '', github: '', technologies: [] };
+        newItem = { name: '', path: '', image: '', description: '', github: '', owner: '', technologies: [] };
         break;
       case 'experience':
         newItem = { position: '', company: '', duration: '', responsibilities: [''] };
@@ -431,21 +442,147 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             </div>
             
             <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white">Skills</h4>
-              {(formData.home?.skills || []).map((skill: {text: string, color: string}, index: number) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-700 rounded-lg">
-                  <Input
-                    value={skill.text || ''}
-                    onChange={(e) => handleArrayChange('home', index, 'text', e.target.value)}
-                    placeholder={`Skill ${index + 1} text`}
-                    className={commonInputClasses}
-                  />
-                  <Input
-                    value={skill.color || ''}
-                    onChange={(e) => handleArrayChange('home', index, 'color', e.target.value)}
-                    placeholder={`Skill ${index + 1} color`}
-                    className={commonInputClasses}
-                  />
+              <div className="flex items-center justify-between">
+                <h4 className="text-lg font-semibold text-white">Skills</h4>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => setFormData(prev => ({
+                    ...prev,
+                    home: {
+                      ...prev.home,
+                      skills: [...(Array.isArray(prev.home?.skills) ? prev.home.skills : []), { text: '', color: '', techStack: [], workflow: [] }]
+                    }
+                  }))}
+                  className="bg-blue-600 hover:bg-blue-700 text-white border-0"
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Skill
+                </Button>
+              </div>
+              {(formData.home?.skills || []).map((skill: { text: string; color: string; techStack?: Array<{ name: string }>; workflow?: string[] }, index: number) => (
+                <div key={index} className="space-y-4 p-4 bg-gray-700 rounded-lg border border-gray-600">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-400">Skill {index + 1}</span>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setFormData(prev => {
+                        const skills = Array.isArray(prev.home?.skills) ? prev.home.skills : []
+                        return { ...prev, home: { ...prev.home, skills: skills.filter((_, i) => i !== index) } }
+                      })}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      value={skill.text || ''}
+                      onChange={(e) => handleSkillUpdate(index, 'text', e.target.value)}
+                      placeholder={`Skill ${index + 1} text`}
+                      className={commonInputClasses}
+                    />
+                    <Input
+                      value={skill.color || ''}
+                      onChange={(e) => handleSkillUpdate(index, 'color', e.target.value)}
+                      placeholder={`Skill ${index + 1} color`}
+                      className={commonInputClasses}
+                    />
+                  </div>
+
+                  {/* Tech Stack */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-gray-300">Tech Stack</h5>
+                    <div className="flex gap-2">
+                      <select
+                        value={pendingTechs[index] || ''}
+                        onChange={(e) => setPendingTechs(prev => ({ ...prev, [index]: e.target.value }))}
+                        className="flex-1 min-w-0 bg-gray-600 border border-gray-500 text-white text-sm rounded px-2 py-1"
+                      >
+                        <option value="">Select technology...</option>
+                        {Object.keys(TECH_ICONS).map(name => (
+                          <option key={name} value={name}>{name}</option>
+                        ))}
+                      </select>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          const tech = pendingTechs[index]
+                          if (!tech) return
+                          const existing = skill.techStack || []
+                          if (!existing.find(t => t.name === tech)) {
+                            handleSkillUpdate(index, 'techStack', [...existing, { name: tech }])
+                          }
+                          setPendingTechs(prev => ({ ...prev, [index]: '' }))
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white border-0 flex-shrink-0"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {(skill.techStack || []).map(({ name }, techIdx) => {
+                        const tech = TECH_ICONS[name]
+                        const Icon = tech?.icon
+                        return (
+                          <div key={techIdx} className="flex items-center gap-1.5 px-2 py-1 bg-gray-600 rounded-full text-sm border border-gray-500">
+                            {Icon && <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tech.color }} />}
+                            <span className="text-gray-200">{name}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleSkillUpdate(index, 'techStack', (skill.techStack || []).filter((_, i) => i !== techIdx))}
+                              className="text-gray-400 hover:text-red-400 ml-0.5 leading-none"
+                            >×</button>
+                          </div>
+                        )
+                      })}
+                      {(skill.techStack || []).length === 0 && (
+                        <p className="text-gray-500 text-xs italic">No tech added yet</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Workflow */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-sm font-medium text-gray-300">Workflow</h5>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => handleSkillUpdate(index, 'workflow', [...(skill.workflow || []), ''])}
+                        className="bg-purple-600 hover:bg-purple-700 text-white border-0"
+                      >
+                        <Plus className="w-4 h-4 mr-1" /> Add Step
+                      </Button>
+                    </div>
+                    {(skill.workflow || []).map((step, stepIdx) => (
+                      <div key={stepIdx} className="flex items-center gap-2">
+                        <span className="text-gray-400 text-xs w-5 text-right flex-shrink-0">{stepIdx + 1}.</span>
+                        <Input
+                          value={step}
+                          onChange={(e) => {
+                            const steps = [...(skill.workflow || [])]
+                            steps[stepIdx] = e.target.value
+                            handleSkillUpdate(index, 'workflow', steps)
+                          }}
+                          placeholder={`Step ${stepIdx + 1}`}
+                          className={`${commonInputClasses} flex-1`}
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleSkillUpdate(index, 'workflow', (skill.workflow || []).filter((_, i) => i !== stepIdx))}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    {(skill.workflow || []).length === 0 && (
+                      <p className="text-gray-500 text-xs italic">No workflow steps added yet</p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -560,12 +697,20 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       })()}
                     </div>
 
-                    <Input
-                      value={project.github || ''}
-                      onChange={(e) => handleArrayChange('project', index, 'github', e.target.value)}
-                      placeholder="GitHub repository URL"
-                      className={commonInputClasses}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input
+                        value={project.github || ''}
+                        onChange={(e) => handleArrayChange('project', index, 'github', e.target.value)}
+                        placeholder="GitHub repository URL"
+                        className={commonInputClasses}
+                      />
+                      <Input
+                        value={project.owner || ''}
+                        onChange={(e) => handleArrayChange('project', index, 'owner', e.target.value)}
+                        placeholder="Project owner"
+                        className={commonInputClasses}
+                      />
+                    </div>
 
                     <Textarea
                       value={project.description || ''}
@@ -791,17 +936,17 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       {/* Header */}
-      <header className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700 p-6">
+      <header className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700 px-4 py-4 sm:p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <Link 
-              href="/" 
+          <div className="flex items-center space-x-3 sm:space-x-6">
+            <Link
+              href="/"
               className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors group"
             >
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              <span>Back to Home</span>
+              <span className="hidden sm:inline">Back to Home</span>
             </Link>
-            
+
             <Link href="/" className="text-2xl font-bold">
               <motion.span
                 initial={{ opacity: 0, y: -20 }}
@@ -824,7 +969,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:p-6">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
           <div className="lg:w-1/4">

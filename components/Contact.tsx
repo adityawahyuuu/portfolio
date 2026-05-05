@@ -303,10 +303,10 @@ export default function Contact({ data }: { data?: ContactData }) {
                             exit={{ opacity: 0, x: 20 }}
                             className="flex items-center justify-between p-3 bg-gray-600/50 rounded-lg border border-gray-500/30"
                           >
-                            <div className="flex items-center space-x-3">
-                              <Paperclip className="w-4 h-4 text-gray-400" />
-                              <div>
-                                <p className="text-sm text-white font-medium">{file.name}</p>
+                            <div className="flex items-center space-x-3 min-w-0">
+                              <Paperclip className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-sm text-white font-medium truncate">{file.name}</p>
                                 <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
                               </div>
                             </div>

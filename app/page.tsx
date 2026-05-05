@@ -39,7 +39,7 @@ export default function Page() {
       <Header />
       
       {/* Main content with AdminPanel-style layout */}
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 space-y-8">
         {/* Home Section - AdminPanel Card Style */}
         <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
           <Home data={data ? data.home : data} />

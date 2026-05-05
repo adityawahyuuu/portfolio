@@ -41,7 +41,9 @@ export default function Header() {
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const headerHeight = document.querySelector('header')?.clientHeight ?? 0;
+    const top = el.getBoundingClientRect().top + window.scrollY - headerHeight;
+    window.scrollTo({ top, behavior: 'smooth' });
     setActiveSection(id);
   };
 
@@ -168,8 +170,8 @@ export default function Header() {
                     onClick={(e) => {
                       e.preventDefault();
                       const id = item.href.slice(1);
-                      scrollToSection(id);
                       setIsOpen(false);
+                      setTimeout(() => scrollToSection(id), 350);
                     }}
                     className={`w-full justify-start flex items-center space-x-2 ${
                       activeSection === item.href.slice(1) 
