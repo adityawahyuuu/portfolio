@@ -4,8 +4,6 @@ const next = require('next');
 const express = require('express');
 const path = require('path');
 
-// Force production mode
-process.env.NODE_ENV = 'production';
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();

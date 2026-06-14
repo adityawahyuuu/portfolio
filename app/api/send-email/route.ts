@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const user = process.env.TITAN_EMAIL;
-    const pass = process.env.TITAN_PASSWORD;
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
 
     if (!user || !pass) {
       return NextResponse.json(
@@ -22,11 +22,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Transporter Titan Email (SMTP)
     const transporter = nodemailer.createTransport({
-      host: 'smtp.titan.email',
-      port: 465,
-      secure: true, // 465 = SSL
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: process.env.SMTP_SECURE === 'true',
       auth: { user, pass },
     });
 

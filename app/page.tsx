@@ -7,7 +7,6 @@ import Home from "@/components/Home";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import Projects from "@/components/Projects";
-import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
@@ -16,12 +15,9 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log("Starting Firebase connection...");
-
     const dataRef = ref(database, "/");
     onValue(dataRef, (snapshot) => {
-      const fetchedData = snapshot.val();
-      setData(fetchedData);
+      setData(snapshot.val());
       setLoading(false);
     }, (error) => {
       console.error("Firebase error:", error);
@@ -35,34 +31,27 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      {/* Header with consistent AdminPanel styling */}
       <Header />
-      
-      {/* Main content with AdminPanel-style layout */}
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 space-y-8">
-        {/* Home Section - AdminPanel Card Style */}
+
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 space-y-0">
         <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
-          <Home data={data ? data.home : data} />
+          <Home data={data ? data.home : data} contact={data ? data.contact : null} />
         </div>
-        
-        {/* Projects Section - AdminPanel Card Style */}
+
+        <div className="py-2" />
+
         <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
           <Projects data={data ? data.project : data} />
         </div>
-        
-        {/* Experience Section - AdminPanel Card Style */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
-          <Experience data={data ? data.experience : data} />
-        </div>
-        
-        {/* Contact Section - AdminPanel Card Style */}
+
+        <div className="py-2" />
+
         <div className="bg-gray-800/50 border border-gray-700 rounded-lg backdrop-blur-xl">
           <Contact data={data ? data.contact : data} />
         </div>
       </div>
-      
-      {/* Footer with AdminPanel styling */}
-      <div className="bg-gray-800/50 backdrop-blur-xl border-t border-gray-700">
+
+      <div className="bg-gray-800/50 backdrop-blur-xl border-t border-gray-700 mt-8">
         <Footer />
       </div>
     </div>

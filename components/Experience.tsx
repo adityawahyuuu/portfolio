@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Briefcase, ChevronDown, ChevronUp } from "lucide-react"
@@ -23,9 +22,9 @@ export default function Experience({ data }: { data?: ExperienceItem[] }) {
   const experienceData = Object.values(data || {});
 
   return (
-    <section id="experience" className="p-6">
-      <CardHeader>
-        <CardTitle className="text-2xl font-semibold text-white flex items-center">
+    <section id="experience" className="p-4 sm:p-6">
+      <CardHeader className="px-0 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl font-semibold text-white flex items-center">
           <div className="p-2 rounded-lg mr-3 bg-purple-500">
             <Briefcase className="w-5 h-5" />
           </div>
@@ -33,23 +32,20 @@ export default function Experience({ data }: { data?: ExperienceItem[] }) {
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-0 sm:px-6">
         {experienceData.length > 0 ? (
           <div className="space-y-4">
             {experienceData.map((item, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <Card className="bg-gray-700/50 border-gray-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
-                  <CardContent className="p-6">
-                    <motion.div
-                      className="flex items-center justify-between cursor-pointer"
+                  <CardContent className="p-4 sm:p-6">
+                    <div
+                      className="flex items-center justify-between cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-transform duration-200"
                       onClick={() => toggleExpand(index)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
                     >
                       <div className="flex items-center flex-grow">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mr-3 sm:mr-4 shadow-lg flex-shrink-0">
@@ -78,56 +74,42 @@ export default function Experience({ data }: { data?: ExperienceItem[] }) {
                           </>
                         )}
                       </Button>
-                    </motion.div>
+                    </div>
 
-                    <AnimatePresence>
-                      {expandedIndex === index && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="mt-4 pt-4 border-t border-gray-600 overflow-hidden"
-                        >
-                          <div className="space-y-3">
-                            <h4 className="text-sm font-semibold text-white flex items-center">
-                              <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                              Key Responsibilities
-                            </h4>
-                            <ul className="space-y-2 ml-4">
-                              {item.responsibilities.map((responsibility, idx) => (
-                                <motion.li
-                                  key={idx}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ duration: 0.3, delay: idx * 0.1 }}
-                                  className="text-gray-300 hover:text-white transition-colors text-sm flex items-start"
-                                >
-                                  <div className="w-1 h-1 bg-purple-400 rounded-full mr-2 mt-2 flex-shrink-0"></div>
-                                  <span>{responsibility}</span>
-                                </motion.li>
-                              ))}
-                            </ul>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {/* Expand/collapse via CSS grid trick */}
+                    <div className={`grid transition-all duration-300 ${expandedIndex === index ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                      <div className="overflow-hidden">
+                        <div className="mt-4 pt-4 border-t border-gray-600 space-y-3">
+                          <h4 className="text-sm font-semibold text-white flex items-center">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                            Key Responsibilities
+                          </h4>
+                          <ul className="space-y-2 ml-2 sm:ml-4">
+                            {item.responsibilities.map((responsibility, idx) => (
+                              <li
+                                key={idx}
+                                className="text-gray-300 hover:text-white transition-colors text-sm flex items-start"
+                              >
+                                <div className="w-1 h-1 bg-purple-400 rounded-full mr-2 mt-2 flex-shrink-0"></div>
+                                <span>{responsibility}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
+          <div className="text-center py-12 animate-in fade-in duration-500">
             <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Briefcase className="w-8 h-8 text-gray-400" />
             </div>
             <p className="text-gray-400">No experience data available yet.</p>
-          </motion.div>
+          </div>
         )}
       </CardContent>
     </section>

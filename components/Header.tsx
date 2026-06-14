@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Menu, X, User, Home, Briefcase, BookOpen, Mail } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 
 export default function Header() {
@@ -14,7 +13,7 @@ export default function Header() {
 
   useEffect(() => {
     const sections = ['home', 'projects', 'experience', 'contact']
-    
+
     const handleScroll = () => {
       const headerH = document.querySelector('header')?.clientHeight ?? 0;
       const y = headerH + 1;
@@ -47,10 +46,6 @@ export default function Header() {
     setActiveSection(id);
   };
 
-  const handleAdminClick = () => {
-    router.push('/login');
-  };
-
   const navItems = [
     { href: '#home', label: 'Home', icon: Home },
     { href: '#projects', label: 'Projects', icon: Briefcase },
@@ -63,131 +58,88 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold">
-            <motion.span
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500"
-            >
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 animate-in fade-in slide-in-from-top-4 duration-500">
               Portfolio
-            </motion.span>
+            </span>
           </Link>
-          
+
           <nav className="hidden md:flex space-x-2">
             {navItems.map((item, index) => (
-              <motion.div
+              <div
                 key={item.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="animate-in fade-in slide-in-from-top-4 duration-500"
+                style={{ animationDelay: `${index * 75}ms` }}
               >
                 <Button
                   variant={activeSection === item.href.slice(1) ? "secondary" : "ghost"}
                   onClick={(e) => {
                     e.preventDefault();
-                    const id = item.href.slice(1);
-                    scrollToSection(id);
+                    scrollToSection(item.href.slice(1));
                   }}
                   className={`flex items-center space-x-2 transition-all duration-300 ${
-                    activeSection === item.href.slice(1) 
-                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    activeSection === item.href.slice(1)
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'text-gray-300 hover:text-white hover:bg-gray-700'
                   }`}
                 >
-                  <motion.span
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <item.icon className="w-4 h-4" />
-                  </motion.span>
+                  <item.icon className="w-4 h-4" />
                   <span>{item.label}</span>
                 </Button>
-              </motion.div>
+              </div>
             ))}
           </nav>
-          
+
           <div className="flex items-center space-x-2">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <Button
+              size="icon"
+              onClick={() => router.push('/login')}
+              className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 border-0 shadow-md shadow-purple-500/30 hover:scale-110 active:scale-90 transition-transform duration-200"
             >
-              <Button
-                size="icon"
-                onClick={handleAdminClick}
-                className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 border-0 shadow-md shadow-purple-500/30"
-              >
-                <User className="h-4 w-4" />
-              </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="md:hidden"
+              <User className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden text-gray-300 hover:text-white hover:scale-110 active:scale-90 transition-transform duration-200"
             >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsOpen(!isOpen)}
-                className="text-gray-300 hover:text-white"
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={isOpen ? 'close' : 'open'}
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-                  </motion.div>
-                </AnimatePresence>
-              </Button>
-            </motion.div>
+              {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </Button>
           </div>
         </div>
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-gray-800/80 backdrop-blur-xl border-t border-gray-700"
-          >
-            <nav className="max-w-7xl mx-auto px-6 py-4 space-y-2">
-              {navItems.map((item, index) => (
-                <motion.div
-                  key={item.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
+      {/* Mobile menu — CSS max-height transition */}
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="bg-gray-800/80 backdrop-blur-xl border-t border-gray-700">
+          <nav className="max-w-7xl mx-auto px-6 py-4 space-y-2">
+            {navItems.map((item, index) => (
+              <div
+                key={item.href}
+                style={{ animationDelay: `${index * 75}ms` }}
+              >
+                <Button
+                  variant={activeSection === item.href.slice(1) ? "secondary" : "ghost"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsOpen(false);
+                    setTimeout(() => scrollToSection(item.href.slice(1)), 350);
+                  }}
+                  className={`w-full justify-start flex items-center space-x-2 ${
+                    activeSection === item.href.slice(1)
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                  }`}
                 >
-                  <Button
-                    variant={activeSection === item.href.slice(1) ? "secondary" : "ghost"}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const id = item.href.slice(1);
-                      setIsOpen(false);
-                      setTimeout(() => scrollToSection(id), 350);
-                    }}
-                    className={`w-full justify-start flex items-center space-x-2 ${
-                      activeSection === item.href.slice(1) 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </Button>
-                </motion.div>
-              ))}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Button>
+              </div>
+            ))}
+          </nav>
+        </div>
+      </div>
     </header>
   )
 }

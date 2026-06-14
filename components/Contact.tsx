@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from "framer-motion";
 import { ContactData, FormData } from "@/types/contact";
 import { useState } from 'react';
 import { Github, Linkedin, Twitter, Mail, Loader2, CheckCircle, Paperclip, X } from 'lucide-react';
@@ -195,9 +194,9 @@ export default function Contact({ data }: { data?: ContactData }) {
 
   return (
     <>
-      <section id="contact" className="p-6">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-white flex items-center">
+      <section id="contact" className="p-4 sm:p-6">
+        <CardHeader className="px-0 sm:px-6">
+          <CardTitle className="text-xl sm:text-2xl font-semibold text-white flex items-center">
             <div className="p-2 rounded-lg mr-3 bg-pink-500">
               <Mail className="w-5 h-5" />
             </div>
@@ -205,15 +204,15 @@ export default function Contact({ data }: { data?: ContactData }) {
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          <p className="text-gray-300 text-center mb-8">
+        <CardContent className="space-y-6 px-0 sm:px-6">
+          <p className="text-gray-300 text-center mb-4 sm:mb-8">
             Let's connect and bring your ideas to life!
           </p>
 
           <Card className="bg-gray-700/50 border-gray-600">
-            <CardContent className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="p-4 sm:p-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-2">
                       Name *
@@ -270,15 +269,15 @@ export default function Contact({ data }: { data?: ContactData }) {
                     <div className="flex items-center justify-center w-full">
                       <label 
                         htmlFor="attachments" 
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-500 border-dashed rounded-lg cursor-pointer bg-gray-600/50 hover:bg-gray-600/70 transition-all duration-300"
+                        className="flex flex-col items-center justify-center w-full h-28 sm:h-32 border-2 border-gray-500 border-dashed rounded-lg cursor-pointer bg-gray-600/50 hover:bg-gray-600/70 transition-all duration-300"
                       >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Paperclip className="w-8 h-8 mb-2 text-gray-400" />
-                          <p className="mb-2 text-sm text-gray-300">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
+                        <div className="flex flex-col items-center justify-center py-3 sm:py-5">
+                          <Paperclip className="w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 text-gray-400" />
+                          <p className="mb-1 text-sm text-gray-300 text-center">
+                            <span className="font-semibold">Click to upload</span>
                           </p>
-                          <p className="text-xs text-gray-400">
-                            Max 3 files, 5MB each (PDF, DOC, IMG files)
+                          <p className="text-xs text-gray-400 text-center">
+                            Max 3 files, 5MB each
                           </p>
                         </div>
                         <Input
@@ -296,12 +295,9 @@ export default function Contact({ data }: { data?: ContactData }) {
                       <div className="space-y-2">
                         <p className="text-sm text-gray-300 font-medium">Selected files:</p>
                         {formData.attachments.map((file, index) => (
-                          <motion.div
+                          <div
                             key={index}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20 }}
-                            className="flex items-center justify-between p-3 bg-gray-600/50 rounded-lg border border-gray-500/30"
+                            className="flex items-center justify-between p-3 bg-gray-600/50 rounded-lg border border-gray-500/30 animate-in fade-in slide-in-from-left-4 duration-300"
                           >
                             <div className="flex items-center space-x-3 min-w-0">
                               <Paperclip className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -319,7 +315,7 @@ export default function Contact({ data }: { data?: ContactData }) {
                             >
                               <X className="w-4 h-4" />
                             </Button>
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
                     )}
@@ -361,13 +357,13 @@ export default function Contact({ data }: { data?: ContactData }) {
             const waNumber = phone.replace(/\D/g, '');
             const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo, saya ingin menghubungi Anda.')}`;
             return (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 sm:mt-8">
                 <a href={`mailto:${email}`} className="block">
                   <Card className="bg-gray-700/50 border-gray-600 hover:border-pink-500/50 transition-colors cursor-pointer">
                     <CardContent className="p-4 text-center">
                       <Mail className="w-8 h-8 text-pink-400 mx-auto mb-2" />
                       <p className="text-gray-300 text-sm">Email</p>
-                      <p className="text-white text-sm">{email}</p>
+                      <p className="text-white text-sm break-all">{email}</p>
                     </CardContent>
                   </Card>
                 </a>
@@ -398,18 +394,16 @@ export default function Contact({ data }: { data?: ContactData }) {
               {data.socialLinks.map((link, index) => {
                 const Icon = socialIcons[link.icon] || (() => null);
                 return (
-                  <motion.a
+                  <a
                     key={index}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-3 bg-gray-700/50 border border-gray-600 hover:border-pink-500/50 rounded-full text-gray-400 hover:text-pink-300 transition-all duration-300"
+                    className="p-3 bg-gray-700/50 border border-gray-600 hover:border-pink-500/50 rounded-full text-gray-400 hover:text-pink-300 hover:scale-110 active:scale-95 transition-all duration-200"
                   >
                     <Icon className="w-6 h-6" />
                     <span className="sr-only">{link.name}</span>
-                  </motion.a>
+                  </a>
                 );
               })}
             </div>
@@ -420,14 +414,9 @@ export default function Contact({ data }: { data?: ContactData }) {
       <Dialog open={showThankYou} onOpenChange={setShowThankYou}>
         <DialogContent className="bg-gray-800 border-gray-600">
           <DialogHeader>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", duration: 0.6 }}
-              className="mx-auto rounded-full bg-green-500/20 p-3 mb-4"
-            >
+            <div className="mx-auto rounded-full bg-green-500/20 p-3 mb-4 animate-in zoom-in-50 duration-300">
               <CheckCircle className="w-12 h-12 text-green-500" />
-            </motion.div>
+            </div>
             <DialogTitle className="text-2xl text-center text-white mb-2">
               Thank You for Reaching Out!
             </DialogTitle>
