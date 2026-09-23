@@ -69,7 +69,7 @@ jobs:
 
       - name: Pull latest image and restart container
         working-directory: D:\gawe\Full Stack - Portfolio\portfolio
-        shell: pwsh
+        shell: powershell
         run: |
           docker compose pull
           docker compose up -d
