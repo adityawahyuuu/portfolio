@@ -1,0 +1,14 @@
+services:
+  portfolio:
+    image: ghcr.io/adityawahyuuu/portfolio:latest
+    container_name: portfolio
+    restart: unless-stopped
+    ports:
+      - "5172:5172"
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      PORT: "5172"
+    volumes:
+      - ./public/asset/projects:/app/public/asset/projects
