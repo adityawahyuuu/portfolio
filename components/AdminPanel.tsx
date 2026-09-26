@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { database } from '../lib/firebase'
 import { ref, set, get } from 'firebase/database'
-import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Upload } from 'lucide-react'
+import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Upload, ArrowUp, ArrowDown } from 'lucide-react'
 import { TECH_ICONS } from '@/lib/techIcons'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
@@ -205,6 +205,27 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
         ...prev,
         [section]: [...sectionArray, newItem]
       };
+    });
+  }
+
+  const handleMoveItem = (section: keyof FormData, index: number, direction: 'up' | 'down') => {
+    setFormData(prev => {
+      const currentSection = prev[section];
+      let sectionArray: any[] = [];
+
+      // Convert object to array if needed (Firebase sometimes returns objects)
+      if (currentSection && !Array.isArray(currentSection) && typeof currentSection === 'object') {
+        sectionArray = Object.values(currentSection);
+      } else if (Array.isArray(currentSection)) {
+        sectionArray = currentSection;
+      }
+
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= sectionArray.length) return prev;
+
+      const updated = [...sectionArray];
+      [updated[index], updated[targetIndex]] = [updated[targetIndex], updated[index]];
+      return { ...prev, [section]: updated };
     });
   }
 
@@ -545,7 +566,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   projectData = [];
                 }
                 
-                return projectData.map((project: {name: string, path: string, image: string, description: string, github?: string, technologies?: Array<{ name: string; color: string }>}, index: number) => (
+                return projectData.map((project: {name: string, path: string, images?: string[], description: string, github?: string, technologies?: Array<{ name: string; color: string }>}, index: number) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: -20 }}
@@ -556,15 +577,35 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   >
                     <div className="flex items-center justify-between">
                       <h4 className="text-lg font-semibold text-white">Project {index + 1}</h4>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteItem('project', index)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleMoveItem('project', index, 'up')}
+                          disabled={index === 0}
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleMoveItem('project', index, 'down')}
+                          disabled={index === projectData.length - 1}
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteItem('project', index)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
