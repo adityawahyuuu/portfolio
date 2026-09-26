@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { database } from '../lib/firebase'
 import { ref, set, get } from 'firebase/database'
-import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Briefcase, Upload } from 'lucide-react'
+import { Trash2, Plus, ArrowLeft, LogOut, Home, FolderOpen, Upload } from 'lucide-react'
 import { TECH_ICONS } from '@/lib/techIcons'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
@@ -31,12 +31,6 @@ interface FormData {
     owner?: string;
     technologies?: Array<{ name: string; color: string }>;
   }>;
-  experience: Array<{
-    position: string;
-    company: string;
-    duration: string;
-    responsibilities: string[];
-  }>;
 }
 
 interface AdminPanelProps {
@@ -53,14 +47,12 @@ const defaultData: FormData = {
     description2: '', 
     skills: []
   },
-  project: [],
-  experience: []
+  project: []
 };
 
 const sectionConfig = {
   home: { icon: Home, label: 'Home Section', color: 'bg-blue-500' },
   project: { icon: FolderOpen, label: 'Projects', color: 'bg-green-500' },
-  experience: { icon: Briefcase, label: 'Experience', color: 'bg-purple-500' },
 };
 
 export default function AdminPanel({ onLogout }: AdminPanelProps) {
@@ -195,9 +187,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       case 'project':
         newItem = { name: '', path: '', image: '', description: '', github: '', owner: '', technologies: [] };
         break;
-      case 'experience':
-        newItem = { position: '', company: '', duration: '', responsibilities: [''] };
-        break;
       default:
         return;
     }
@@ -238,62 +227,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       }
       // Jika section tidak ada atau kosong, return state yang sama
       return prev;
-    });
-  }
-
-  const handleAddResponsibility = (index: number) => {
-    setFormData(prev => {
-      let experienceData = prev.experience;
-      let experienceArray: any[] = [];
-      
-      // Convert object to array if needed (Firebase sometimes returns objects)
-      if (experienceData && !Array.isArray(experienceData) && typeof experienceData === 'object') {
-        experienceArray = Object.values(experienceData);
-      } else if (Array.isArray(experienceData)) {
-        experienceArray = experienceData;
-      }
-      
-      // Create a copy of the array
-      const updatedExperience = [...experienceArray];
-      
-      if (updatedExperience[index]) {
-        const currentResponsibilities = updatedExperience[index].responsibilities || [];
-        const responsibilitiesArray = Array.isArray(currentResponsibilities) ? currentResponsibilities : [];
-        
-        updatedExperience[index] = {
-          ...updatedExperience[index],
-          responsibilities: [...responsibilitiesArray, '']
-        };
-      }
-      return { ...prev, experience: updatedExperience };
-    });
-  }
-
-  const handleDeleteResponsibility = (expIndex: number, respIndex: number) => {
-    setFormData(prev => {
-      let experienceData = prev.experience;
-      let experienceArray: any[] = [];
-
-      // Convert object to array if needed (Firebase sometimes returns objects)
-      if (experienceData && !Array.isArray(experienceData) && typeof experienceData === 'object') {
-        experienceArray = Object.values(experienceData);
-      } else if (Array.isArray(experienceData)) {
-        experienceArray = experienceData;
-      }
-
-      // Create a copy of the array
-      const updatedExperience = [...experienceArray];
-
-      if (updatedExperience[expIndex]) {
-        const currentResponsibilities = updatedExperience[expIndex].responsibilities || [];
-        const responsibilitiesArray = Array.isArray(currentResponsibilities) ? currentResponsibilities : [];
-
-        updatedExperience[expIndex] = {
-          ...updatedExperience[expIndex],
-          responsibilities: responsibilitiesArray.filter((_, i) => i !== respIndex)
-        };
-      }
-      return { ...prev, experience: updatedExperience };
     });
   }
 
@@ -795,134 +728,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               type="submit" 
               disabled={isSaving}
               className="w-full bg-green-600 hover:bg-green-700"
-            >
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </form>
-        )
-      case 'experience':
-        return (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <AnimatePresence>
-              {(() => {
-                let experienceData = formData.experience || [];
-                
-                // Convert object to array if Firebase returns object format
-                if (!Array.isArray(experienceData) && typeof experienceData === 'object') {
-                  experienceData = Object.values(experienceData);
-                }
-                
-                // Ensure it's an array
-                if (!Array.isArray(experienceData)) {
-                  experienceData = [];
-                }
-                
-                return experienceData.map((exp: {position: string, company: string, duration: string, responsibilities: string[]}, index: number) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4 p-6 border border-gray-600 rounded-lg relative bg-gray-700"
-                  >
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-lg font-semibold text-white">Experience {index + 1}</h4>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteItem('experience', index)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input
-                        value={exp.position || ''}
-                        onChange={(e) => handleArrayChange('experience', index, 'position', e.target.value)}
-                        placeholder="Position"
-                        className={commonInputClasses}
-                      />
-                      <Input
-                        value={exp.company || ''}
-                        onChange={(e) => handleArrayChange('experience', index, 'company', e.target.value)}
-                        placeholder="Company"
-                        className={commonInputClasses}
-                      />
-                    </div>
-                    
-                    <Input
-                      value={exp.duration || ''}
-                      onChange={(e) => handleArrayChange('experience', index, 'duration', e.target.value)}
-                      placeholder="Duration"
-                      className={commonInputClasses}
-                    />
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h5 className="text-md font-medium text-white">Responsibilities</h5>
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => handleAddResponsibility(index)}
-                          className="bg-purple-600 hover:bg-purple-500 text-white border-0"
-                        >
-                          <Plus className="h-4 w-4 mr-2" /> Add Responsibility
-                        </Button>
-                      </div>
-                      
-                      {(() => {
-                        let responsibilities = exp.responsibilities || [];
-                        
-                        // Ensure responsibilities is always an array
-                        if (!Array.isArray(responsibilities)) {
-                          responsibilities = [];
-                        }
-                        
-                        return responsibilities.map((resp: string, respIndex: number) => (
-                          <div key={respIndex} className="flex items-center space-x-2">
-                            <Input
-                              value={resp || ''}
-                              onChange={(e) => {
-                                const newResponsibilities = [...responsibilities];
-                                newResponsibilities[respIndex] = e.target.value;
-                                handleArrayChange('experience', index, 'responsibilities', newResponsibilities);
-                              }}
-                              placeholder={`Responsibility ${respIndex + 1}`}
-                              className={`${commonInputClasses} flex-1`}
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteResponsibility(index, respIndex)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ));
-                      })()}
-                    </div>
-                  </motion.div>
-                ));
-              })()}
-            </AnimatePresence>
-            
-            <Button
-              type="button"
-              onClick={() => handleAddItem('experience')}
-              className="w-full bg-purple-700 hover:bg-purple-600 text-white border-0"
-            >
-              <Plus className="h-4 w-4 mr-2" /> Add Experience
-            </Button>
-            
-            <Button 
-              type="submit" 
-              disabled={isSaving}
-              className="w-full bg-purple-600 hover:bg-purple-700"
             >
               {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>

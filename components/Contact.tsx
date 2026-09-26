@@ -140,56 +140,49 @@ export default function Contact({ data }: { data?: ContactData }) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      // Validate form data
-      if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-        toast({
-          title: "Validation Error",
-          description: "Please fill in all required fields",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Check if files are still being processed
-      const totalSize = (formData.attachments || []).reduce((sum, file) => sum + file.size, 0);
-      if (totalSize > 25 * 1024 * 1024) { // 25MB total limit
-        toast({
-          title: "Attachments Too Large",
-          description: "Total attachment size cannot exceed 25MB",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const result = await sendEmailWithAPI(formData);
-
-      if (result.success) {
-        toast({
-          title: "Message Sent!",
-          description: `Your message${formData.attachments?.length ? ' with attachment info' : ''} has been sent successfully. I'll get back to you soon!`,
-        });
-        
-        setShowThankYou(true);
-        setFormData({ name: '', email: '', message: '', attachments: [] }); // Reset form
-      } else {
-        throw new Error('Failed to send message');
-      }
-    } catch (error) {
-      console.error('Error sending email:', error);
-      
+    // Validate form data
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       toast({
-        title: "Failed to Send",
-        description: "There was an error sending your message. Please try again or contact me directly.",
+        title: "Validation Error",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
+      return;
     }
+
+    // Check if files are still being processed
+    const totalSize = (formData.attachments || []).reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > 25 * 1024 * 1024) { // 25MB total limit
+      toast({
+        title: "Attachments Too Large",
+        description: "Total attachment size cannot exceed 25MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Send in the background — the form is confirmed as submitted immediately,
+    // without waiting for the SMTP delivery to finish.
+    sendEmailWithAPI(formData)
+      .then((result) => {
+        if (!result.success) {
+          console.error('Failed to send email:', result.error);
+        }
+      })
+      .finally(() => setIsSubmitting(false));
+
+    toast({
+      title: "Message Sent!",
+      description: `Your message${formData.attachments?.length ? ' with attachment info' : ''} has been submitted successfully. I'll get back to you soon!`,
+    });
+
+    setShowThankYou(true);
+    setFormData({ name: '', email: '', message: '', attachments: [] }); // Reset form
   };
 
   return (

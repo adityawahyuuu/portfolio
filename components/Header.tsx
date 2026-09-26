@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Menu, X, User, Home, Briefcase, BookOpen, Mail } from 'lucide-react'
+import { Menu, X, User, Home, Briefcase, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function Header() {
@@ -12,7 +12,7 @@ export default function Header() {
   const router = useRouter()
 
   useEffect(() => {
-    const sections = ['home', 'projects', 'experience', 'contact']
+    const sections = ['home', 'projects', 'contact']
 
     const handleScroll = () => {
       const headerH = document.querySelector('header')?.clientHeight ?? 0;
@@ -49,7 +49,6 @@ export default function Header() {
   const navItems = [
     { href: '#home', label: 'Home', icon: Home },
     { href: '#projects', label: 'Projects', icon: Briefcase },
-    { href: '#experience', label: 'Experience', icon: BookOpen },
     { href: '#contact', label: 'Contact', icon: Mail },
   ]
 
