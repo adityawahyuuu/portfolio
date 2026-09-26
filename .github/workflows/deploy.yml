@@ -61,11 +61,12 @@ jobs:
     runs-on: [self-hosted, windows]
     steps:
       - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $env:GHCR_TOKEN | docker login ${{ env.REGISTRY }} -u $env:GHCR_USER --password-stdin
 
       - name: Pull latest image and restart container
         working-directory: D:\gawe\Full Stack - Portfolio\portfolio

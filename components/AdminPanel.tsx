@@ -28,7 +28,6 @@ interface FormData {
     images?: string[];
     description: string;
     github?: string;
-    owner?: string;
     technologies?: Array<{ name: string; color: string }>;
   }>;
 }
@@ -185,7 +184,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     let newItem: any;
     switch (section) {
       case 'project':
-        newItem = { name: '', path: '', image: '', description: '', github: '', owner: '', technologies: [] };
+        newItem = { name: '', path: '', image: '', description: '', github: '', technologies: [] };
         break;
       default:
         return;
@@ -630,20 +629,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       })()}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input
-                        value={project.github || ''}
-                        onChange={(e) => handleArrayChange('project', index, 'github', e.target.value)}
-                        placeholder="GitHub repository URL"
-                        className={commonInputClasses}
-                      />
-                      <Input
-                        value={project.owner || ''}
-                        onChange={(e) => handleArrayChange('project', index, 'owner', e.target.value)}
-                        placeholder="Project owner"
-                        className={commonInputClasses}
-                      />
-                    </div>
+                    <Input
+                      value={project.github || ''}
+                      onChange={(e) => handleArrayChange('project', index, 'github', e.target.value)}
+                      placeholder="GitHub repository URL"
+                      className={commonInputClasses}
+                    />
 
                     <Textarea
                       value={project.description || ''}

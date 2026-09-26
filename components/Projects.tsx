@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ChevronLeft, ChevronRight, Github, ExternalLink, FolderOpen } from 'lucide-react'
 
 interface Project {
@@ -15,12 +15,11 @@ interface Project {
   description?: string;
   technologies?: { name: string; color: string }[];
   github?: string;
-  owner?: string;
 }
 
 function ImageSlider({ images, projectName, tall }: { images: string[]; projectName?: string; tall?: boolean }) {
   const [idx, setIdx] = useState(0)
-  const imgs = images.length ? images : ['/asset/WIP-banner.jpeg']
+  const imgs = images.length ? images : ['/asset/WIP-banner.png']
 
   return (
     <div className={`relative w-full rounded-lg overflow-hidden bg-gray-900 flex-shrink-0 ${tall ? 'aspect-video' : 'h-48'}`}>
@@ -95,9 +94,6 @@ export default function Projects({ data }: { data?: Project[] }) {
                 <ImageSlider images={project.images || []} projectName={project.name} />
 
                 <div className="flex-1 flex flex-col gap-2 min-w-0">
-                  {project.owner && (
-                    <p className="text-xs text-gray-500 uppercase tracking-widest truncate">{project.owner}</p>
-                  )}
                   <h2 className="text-sm font-bold text-white uppercase tracking-wide leading-snug line-clamp-2">
                     {project.name || 'Untitled Project'}
                   </h2>
@@ -177,9 +173,6 @@ export default function Projects({ data }: { data?: Project[] }) {
               <FolderOpen className="w-5 h-5" />
               {detailProject?.name || 'Project Details'}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
-              {detailProject?.owner && `Owner: ${detailProject.owner}`}
-            </DialogDescription>
           </DialogHeader>
 
           {detailProject && (
