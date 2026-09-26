@@ -9,7 +9,7 @@ export default function Footer() {
                 <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                     <div className="text-center md:text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <h2 className="text-xl font-bold text-white">Aditya Wahyu Pradhana</h2>
-                        <p className="text-sm text-gray-400">Software Developer</p>
+                        <p className="text-sm text-gray-400">Software Engineer</p>
                     </div>
 
                     <div className="flex space-x-4 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '150ms' }}>

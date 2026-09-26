@@ -43,7 +43,7 @@ export default function Home({ data, contact }: { data: HomeData; contact?: Cont
             Aditya Wahyu Pradhana
           </h1>
           <p className="mt-1 text-lg font-semibold text-blue-400 uppercase tracking-widest animate-in fade-in slide-in-from-left-6 duration-600" style={{ animationDelay: '80ms' }}>
-            {data.subtitle || "Software Developer"}
+            {data.subtitle}
           </p>
 
           <div className="mt-4 h-px bg-gray-700" />
