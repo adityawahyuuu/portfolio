@@ -59,6 +59,8 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: [self-hosted, windows]
+    permissions:
+      packages: read
     steps:
       - name: Log in to GHCR
         shell: powershell
